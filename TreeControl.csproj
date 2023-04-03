@@ -25,10 +25,18 @@
 	<ItemGroup>
 	  <Folder Include="Code\" />
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="CitiesHarmony.API" Version="2.2.0" />
+	  <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
 	<Target Name="DeployToModDirectory" AfterTargets="Build">
 		<PropertyGroup>
 			<DeployDir>$(LOCALAPPDATA)/Colossal Order/Cities_Skylines/Addons/Mods/$(SolutionName)/</DeployDir>
 		</PropertyGroup>
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DeployDir)" />
+		<Copy SourceFiles="$(TargetDir)/CitiesHarmony.API.dll" DestinationFolder="$(DeployDir)" />
 	</Target>
 </Project>
