@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net35</TargetFramework>
+		<Title>Tree Control</Title>
+		<AssemblyTitle>$(Title)</AssemblyTitle>
+		<Description>A Cities: Skylines mod.</Description>
+		<Authors>algernon</Authors>
+		<Copyright>Copyright © 2023 algernon</Copyright>
+		<Product>$(Title)</Product>
+		<Version>0.0.1</Version>
+		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
+		<AssemblySearchPaths>
+			$(AssemblySearchPaths);
+			$(ManagedDLLPath)
+		</AssemblySearchPaths>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="Assembly-CSharp" />
+		<Reference Include="ColossalManaged" />
+		<Reference Include="ICities" />
+		<Reference Include="UnityEngine" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Code\" />
+	</ItemGroup>
+	<Target Name="DeployToModDirectory" AfterTargets="Build">
+		<PropertyGroup>
+			<DeployDir>$(LOCALAPPDATA)/Colossal Order/Cities_Skylines/Addons/Mods/$(SolutionName)/</DeployDir>
+		</PropertyGroup>
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DeployDir)" />
+	</Target>
+</Project>
