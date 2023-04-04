@@ -9,6 +9,7 @@ namespace TreeControl
     using System.Xml.Serialization;
     using AlgernonCommons.Keybinding;
     using AlgernonCommons.XML;
+    using TreeControl.Patches;
 
     /// <summary>
     /// Global mod settings.
@@ -21,6 +22,11 @@ namespace TreeControl
         /// </summary>
         [XmlIgnore]
         private static readonly string SettingsFileName = Path.Combine(ColossalFramework.IO.DataLocation.localApplicationData, "TreeControl.xml");
+
+        /// <summary>
+        /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
+        /// </summary>
+        public bool HideOnLoad { get => TreeInstancePatches.HideOnLoad; set => TreeInstancePatches.HideOnLoad = value; }
 
         /// <summary>
         /// Gets or sets the tree anarchy hotkey.

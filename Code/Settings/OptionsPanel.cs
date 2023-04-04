@@ -10,6 +10,7 @@ namespace TreeControl
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
+    using TreeControl.Patches;
     using UnityEngine;
 
     /// <summary>
@@ -20,6 +21,7 @@ namespace TreeControl
         // Layout constants.
         private const float Margin = 5f;
         private const float LeftMargin = 24f;
+        private const float GroupMargin = 40f;
         private const float TitleMargin = 50f;
 
         /// <summary>
@@ -48,6 +50,14 @@ namespace TreeControl
             UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
             loggingCheck.isChecked = Logging.DetailLogging;
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
+            currentY += GroupMargin;
+
+            // Hide on load check.
+            UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
+            hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
+            hideOnLoadCheck.isChecked = TreeInstancePatches.HideOnLoad;
+            hideOnLoadCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.HideOnLoad = isChecked; };
+            currentY += GroupMargin;
 
             // Key options.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);

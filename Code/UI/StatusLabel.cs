@@ -51,7 +51,7 @@ namespace TreeControl
             base.Update();
 
             // Set label text.
-            bool anarchyEnabled = TreeToolPatches.AnarchyEnabled;
+            bool anarchyEnabled = TreeInstancePatches.AnarchyEnabled;
             _onLabel.isVisible = anarchyEnabled;
             _offLabel.isVisible = !anarchyEnabled;
         }

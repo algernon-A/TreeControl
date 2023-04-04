@@ -36,9 +36,6 @@ namespace TreeControl
         /// </summary>
         public override void OnEnabled()
         {
-            // Set detailed logging.
-            Logging.DetailLogging = true;
-
             // Perform conflict detection.
             ConflictDetection conflictDetection = new ConflictDetection();
             if (conflictDetection.CheckModConflicts())

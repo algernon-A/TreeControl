@@ -21,6 +21,20 @@ namespace TreeControl.Patches
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     public static class TreeInstancePatches
     {
+        // Anarchy flags.
+        private static bool s_anarchyEnabled = false;
+        private static bool s_hideOnLoad = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether tree anarchy is enabled.
+        /// </summary>
+        internal static bool AnarchyEnabled { get => s_anarchyEnabled; set => s_anarchyEnabled = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
+        /// </summary>
+        internal static bool HideOnLoad { get => s_hideOnLoad; set => s_hideOnLoad = value; }
+
         /// <summary>
         /// Harmony pre-emptive prefix for TreeInstance.GrowState setter to implement tree anarchy.
         /// </summary>
@@ -34,7 +48,7 @@ namespace TreeControl.Patches
             int thisValue = value;
 
             // Always override value of 0 (tree hidden) when anarchy is enabled.
-            if (value == 0 && TreeToolPatches.AnarchyEnabled)
+            if (value == 0 && s_anarchyEnabled)
             {
                 thisValue = 1;
             }
@@ -42,6 +56,32 @@ namespace TreeControl.Patches
             __instance.m_flags = (ushort)((int)(__instance.m_flags & 0xFFFFF0FFu) | Mathf.Clamp(thisValue, 0, 15) << 8);
 
             return false;
+        }
+
+        /// <summary>
+        /// Harmony transpiler for TreeInstance.CheckOverlap to implement tree anarchy.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch("CheckOverlap")]
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> CheckOverlapTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            FieldInfo anarchyState = AccessTools.Field(typeof(TreeInstancePatches), nameof(s_hideOnLoad));
+
+            // Looking for new stloc.s 11 (boolean flag used to signify overlaps).
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 11)
+                {
+                    // Found it - append &= s_hideOnLoad to the boolean value to be stored).
+                    Logging.Message("found stloc.s 11");
+                    yield return new CodeInstruction(OpCodes.Ldsfld, anarchyState);
+                    yield return new CodeInstruction(OpCodes.And);
+                }
+
+                yield return instruction;
+            }
         }
 
         /// <summary>

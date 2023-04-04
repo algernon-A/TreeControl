@@ -16,11 +16,6 @@ namespace TreeControl.Patches
     public static class TreeToolPatches
     {
         /// <summary>
-        /// Gets or sets a value indicating whether tree anarchy is enabled.
-        /// </summary>
-        internal static bool AnarchyEnabled { get; set; } = false;
-
-        /// <summary>
         /// Harmony pre-emptive prefix to TreeTool.CheckPlacementErrors to implement tree anarchy.
         /// </summary>
         /// <param name="__result">Original method result.</param>
@@ -33,7 +28,7 @@ namespace TreeControl.Patches
             __result = ToolErrors.None;
 
             // If anarchy isn't enabled, go on to execute original method (will override default original result assigned above).
-            return !AnarchyEnabled;
+            return !TreeInstancePatches.AnarchyEnabled;
         }
     }
 }
