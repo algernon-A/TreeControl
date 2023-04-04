@@ -12,19 +12,44 @@ namespace TreeControl.Patches
     using AlgernonCommons;
     using HarmonyLib;
     using UnityEngine;
+    using TreeInstance = global::TreeInstance;
 
     /// <summary>
-    /// Harmony patches to implement random tree rotation.
+    /// Harmony patches to implement tree anarchy and random tree rotation.
     /// </summary>
-    [HarmonyPatch(typeof(global::TreeInstance))]
+    [HarmonyPatch(typeof(TreeInstance))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     public static class TreeInstancePatches
     {
+        /// <summary>
+        /// Harmony pre-emptive prefix for TreeInstance.GrowState setter to implement tree anarchy.
+        /// </summary>
+        /// <param name="__instance">TreeInstance instance.</param>
+        /// <param name="value">Value to set.</param>
+        /// <returns>Always false (never execute original method).</returns>
+        [HarmonyPatch(nameof(TreeInstance.GrowState), MethodType.Setter)]
+        [HarmonyPrefix]
+        public static bool SetGrowState(ref TreeInstance __instance, int value)
+        {
+            int thisValue = value;
+
+            // Always override value of 0 (tree hidden) when anarchy is enabled.
+            if (value == 0 && TreeToolPatches.AnarchyEnabled)
+            {
+                thisValue = 1;
+            }
+
+            __instance.m_flags = (ushort)((int)(__instance.m_flags & 0xFFFFF0FFu) | Mathf.Clamp(thisValue, 0, 15) << 8);
+
+            return false;
+        }
+
         /// <summary>
         /// Harmony transpiler for TreeInstance.RenderInstance to implement random tree rotation.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
-        [HarmonyPatch(nameof(global::TreeInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) })]
+        [HarmonyPatch(nameof(TreeInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) })]
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> RenderInstanceTranspiler(IEnumerable<CodeInstruction> instructions)
         {

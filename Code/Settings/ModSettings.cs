@@ -7,6 +7,7 @@ namespace TreeControl
 {
     using System.IO;
     using System.Xml.Serialization;
+    using AlgernonCommons.Keybinding;
     using AlgernonCommons.XML;
 
     /// <summary>
@@ -20,6 +21,12 @@ namespace TreeControl
         /// </summary>
         [XmlIgnore]
         private static readonly string SettingsFileName = Path.Combine(ColossalFramework.IO.DataLocation.localApplicationData, "TreeControl.xml");
+
+        /// <summary>
+        /// Gets or sets the tree anarchy hotkey.
+        /// </summary>
+        [XmlElement("AnarchyKey")]
+        public Keybinding AnarchyKey { get => UIThreading.AnarchyKey; set => UIThreading.AnarchyKey = value; }
 
         /// <summary>
         /// Loads settings from file.

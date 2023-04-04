@@ -18,5 +18,17 @@ namespace TreeControl
         /// Gets a list of permitted loading modes.
         /// </summary>
         protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor };
+
+        /// <summary>
+        /// Performs any actions upon successful level loading completion.
+        /// </summary>
+        /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.).</param>
+        protected override void LoadedActions(LoadMode mode)
+        {
+            base.LoadedActions(mode);
+
+            // Activate display label.
+            StatusLabel.CreateLabel();
+        }
     }
 }

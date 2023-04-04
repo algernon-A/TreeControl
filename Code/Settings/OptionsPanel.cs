@@ -6,6 +6,7 @@
 namespace TreeControl
 {
     using AlgernonCommons;
+    using AlgernonCommons.Keybinding;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
@@ -19,12 +20,16 @@ namespace TreeControl
         // Layout constants.
         private const float Margin = 5f;
         private const float LeftMargin = 24f;
+        private const float TitleMargin = 50f;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OptionsPanel"/> class.
+        /// Called by Unity before the first frame.
+        /// Used to perform setup.
         /// </summary>
-        internal OptionsPanel()
+        public override void Start()
         {
+            base.Start();
+
             // Add controls.
             // Y position indicator.
             float currentY = Margin;
@@ -43,6 +48,18 @@ namespace TreeControl
             UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
             loggingCheck.isChecked = Logging.DetailLogging;
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
+
+            // Key options.
+            float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
+            UISpacers.AddTitleSpacer(this, Margin, currentY, headerWidth, Translations.Translate("KEYS"));
+            currentY += TitleMargin;
+
+            // Anarchy hotkey control.
+            OptionsKeymapping anarchyKeyMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            anarchyKeyMapping.Label = Translations.Translate("KEY_ANARCHY");
+            anarchyKeyMapping.Binding = UIThreading.AnarchyKey;
+            anarchyKeyMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += anarchyKeyMapping.Panel.height + Margin;
         }
     }
 }
