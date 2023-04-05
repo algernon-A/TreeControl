@@ -3,6 +3,7 @@
 "ANARCHY_STATUS","Tree anarchy:","Tree anarchy status indicator text."
 "ON","On","Tree anarchy status indicator text."
 "OFF","Off","Tree anarchy status indicator text."
+"SWAY_FACTOR","Tree movement limit","Options slider title"
 "HIDE_ON_LOAD","Hide trees under networks or buildings on load","Options panel toggle."
 "HIDE_ON_LOAD_TIP","When this is selected, trees under networks or buildings will be automatically hidden when the game loads.",,"Options panel tooltip."
 "TERRAIN_UPDATE","Update tree elevation on terrain change","Checkbox in options panel."

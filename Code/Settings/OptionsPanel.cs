@@ -64,13 +64,17 @@ namespace TreeControl
             terrainUpdateCheck.tooltip = Translations.Translate("TERRAIN_UPDATE_TIP");
             terrainUpdateCheck.isChecked = TreeInstancePatches.UpdateOnTerrain;
             terrainUpdateCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.UpdateOnTerrain = isChecked; };
-            currentY += terrainUpdateCheck.height + 20f;
+            currentY += terrainUpdateCheck.height;
 
             UICheckBox keepAboveGroundCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("KEEP_ABOVEGROUND"));
             keepAboveGroundCheck.tooltip = Translations.Translate("KEEP_ABOVEGROUND_TIP");
             keepAboveGroundCheck.isChecked = TreeInstancePatches.KeepAboveGround;
             keepAboveGroundCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.KeepAboveGround = isChecked; };
             currentY += keepAboveGroundCheck.height + GroupMargin;
+
+            UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(this, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
+            swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
+            currentY += swayFactorSlider.parent.height + GroupMargin;
 
             // Key options.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);

@@ -22,6 +22,16 @@ namespace TreeControl.Patches
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     internal static class TreeInstancePatches
     {
+        /// <summary>
+        /// Minimum tree sway factor.
+        /// </summary>
+        internal const float MinSwayFactor = 0f;
+
+        /// <summary>
+        /// Maximum tree sway factor.
+        /// </summary>
+        internal const float MaxSwayFactor = 1f;
+
         // Anarchy flags.
         private static bool s_anarchyEnabled = false;
         private static bool s_hideOnLoad = true;
@@ -29,6 +39,9 @@ namespace TreeControl.Patches
         // Update on terrain change.
         private static bool s_updateOnTerrain = false;
         private static bool s_keepAboveGround = true;
+
+        // Tree swaying.
+        private static float s_swayFactor = MinSwayFactor;
 
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
@@ -49,6 +62,11 @@ namespace TreeControl.Patches
         /// Gets or sets a value indicating whether trees should be raised to ground level if the terrain is raised above them.
         /// </summary>
         internal static bool KeepAboveGround { get => s_keepAboveGround; set => s_keepAboveGround = value; }
+
+        /// <summary>
+        /// Gets or sets the tree sway factor.
+        /// </summary>
+        internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
 
         /// <summary>
         /// Harmony pre-emptive prefix for TreeInstance.GrowState setter to implement tree anarchy.
@@ -135,7 +153,70 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony transpiler for TreeInstance.RenderInstance to implement random tree rotation.
+        /// Harmony transpiler for TreeInstance.PopulateGroupData to implement tree movement control.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch(nameof(TreeInstance.PopulateGroupData))]
+        [HarmonyPatch(
+            new Type[]
+            {
+                typeof(TreeInfo),
+                typeof(Vector3),
+                typeof(float),
+                typeof(float),
+                typeof(Vector4),
+                typeof(int),
+                typeof(int),
+                typeof(Vector3),
+                typeof(RenderGroup.MeshData),
+                typeof(Vector3),
+                typeof(Vector3),
+                typeof(float),
+                typeof(float),
+            },
+            new ArgumentType[]
+            {
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+            })]
+        [HarmonyTranspiler]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "Long Harmony annotation")]
+        private static IEnumerable<CodeInstruction> PopulateGroupDataTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            // Windspeed.
+            MethodInfo getWindSpeed = AccessTools.Method(typeof(WeatherManager), nameof(WeatherManager.GetWindSpeed), new Type[] { typeof(Vector3) });
+
+            // Looking for call to WeatherManager.GetWindSpeed.
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.Calls(getWindSpeed))
+                {
+                    // Looking for call to WeatherManager.GetWindSpeed - append with our sway factor multiplier.
+                    Logging.Message("found GetWindSpeed");
+                    yield return instruction;
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_swayFactor)));
+                    yield return new CodeInstruction(OpCodes.Mul);
+                    continue;
+                }
+
+                yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Harmony transpiler for TreeInstance.RenderInstance to implement random tree rotation and tree movement control.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
@@ -146,15 +227,26 @@ namespace TreeControl.Patches
             // Quaternion.identity getter.
             MethodInfo qIdentity = AccessTools.PropertyGetter(typeof(Quaternion), nameof(Quaternion.identity));
 
-            // Looking for new Quaternion.identity getter call.
+            // Windspeed.
+            MethodInfo getWindSpeed = AccessTools.Method(typeof(WeatherManager), nameof(WeatherManager.GetWindSpeed), new Type[] { typeof(Vector3) });
+
             foreach (CodeInstruction instruction in instructions)
             {
                 if (instruction.Calls(qIdentity))
                 {
-                    // Found it - drop original call and reokace with our custom method.
+                    // Looking for new Quaternion.identity getter call - replace with call to our custom method.
                     Logging.Message("found Quaternion.identity");
                     yield return new CodeInstruction(OpCodes.Ldarg_2);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeInstancePatches), nameof(TreeRotation)));
+                    continue;
+                }
+                else if (instruction.Calls(getWindSpeed))
+                {
+                    // Looking for call to WeatherManager.GetWindSpeed - append with our sway factor multiplier.
+                    Logging.Message("found GetWindSpeed");
+                    yield return instruction;
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_swayFactor)));
+                    yield return new CodeInstruction(OpCodes.Mul);
                     continue;
                 }
 

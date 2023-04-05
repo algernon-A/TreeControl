@@ -6,7 +6,6 @@
 namespace TreeControl.Patches
 {
     using HarmonyLib;
-    using UnityEngine;
 
     /// <summary>
     /// Harmony patches to implement tree snapping.
