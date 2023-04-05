@@ -52,6 +52,19 @@ namespace TreeControl
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
             currentY += GroupMargin;
 
+            // Update on terrain change checkboxes.
+            UICheckBox terrainUpdateCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("TERRAIN_UPDATE"));
+            terrainUpdateCheck.tooltip = Translations.Translate("TERRAIN_UPDATE_TIP");
+            terrainUpdateCheck.isChecked = TreeInstancePatches.UpdateOnTerrain;
+            terrainUpdateCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.UpdateOnTerrain = isChecked; };
+            currentY += terrainUpdateCheck.height + 20f;
+
+            UICheckBox keepAboveGroundCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("KEEP_ABOVEGROUND"));
+            keepAboveGroundCheck.tooltip = Translations.Translate("KEEP_ABOVEGROUND_TIP");
+            keepAboveGroundCheck.isChecked = TreeInstancePatches.KeepAboveGround;
+            keepAboveGroundCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.KeepAboveGround = isChecked; };
+            currentY += keepAboveGroundCheck.height + 20f;
+
             // Hide on load check.
             UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
             hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");

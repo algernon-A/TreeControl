@@ -29,6 +29,18 @@ namespace TreeControl
         public bool HideOnLoad { get => TreeInstancePatches.HideOnLoad; set => TreeInstancePatches.HideOnLoad = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.
+        /// </summary>
+        [XmlElement("UpdateOnTerrain")]
+        public bool UpdateOnTerrain { get => TreeInstancePatches.UpdateOnTerrain; set => TreeInstancePatches.UpdateOnTerrain = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether trees should be raised to ground level if the terrain is raised above them.
+        /// </summary>
+        [XmlElement("KeepAboveGround")]
+        public bool KeepAboveGround { get => TreeInstancePatches.KeepAboveGround; set => TreeInstancePatches.KeepAboveGround = value; }
+
+        /// <summary>
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
         [XmlElement("AnarchyKey")]

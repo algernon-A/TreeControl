@@ -16,7 +16,7 @@ namespace TreeControl
     public sealed class UIThreading : ThreadingExtensionBase
     {
         // Hotkey.
-        private static Keybinding s_anarchyKey = new Keybinding(KeyCode.T, true, false, false);
+        private static Keybinding s_anarchyKey = new Keybinding(KeyCode.A, false, false, true);
 
         // Flag.
         private bool _anarchyKeyProcessed = false;

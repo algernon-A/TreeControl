@@ -5,6 +5,10 @@
 
 namespace TreeControl.Patches
 {
+    using System.Collections.Generic;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using AlgernonCommons;
     using HarmonyLib;
     using static ToolBase;
 
@@ -29,6 +33,56 @@ namespace TreeControl.Patches
 
             // If anarchy isn't enabled, go on to execute original method (will override default original result assigned above).
             return !TreeInstancePatches.AnarchyEnabled;
+        }
+
+        /// <summary>
+        /// Harmony Transpiler for TreeTool.SimulationStep to implement tree snapping.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch(nameof(TreeTool.SimulationStep))]
+        [HarmonyTranspiler]
+        internal static IEnumerable<CodeInstruction> SimulationStepTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            // Targeting m_currentEditObject alterations.
+            FieldInfo currentEditObject = AccessTools.Field(typeof(RaycastOutput), nameof(RaycastOutput.m_currentEditObject));
+
+            foreach (CodeInstruction instruction in instructions)
+            {
+                // Looking for new RaycastInput constructor call.
+                if (instruction.operand is ConstructorInfo constructor && constructor.DeclaringType == typeof(RaycastInput))
+                {
+                    // Change the RaycastInput for prop snapping.
+                    Logging.Message("found raycast constructor");
+                    yield return instruction;
+                    yield return new CodeInstruction(OpCodes.Ldloca_S, 0);
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeToolPatches), nameof(TreeSnappingRaycast)));
+                    continue;
+                }
+                else if (instruction.LoadsField(currentEditObject))
+                {
+                    // Replace calls to output.m_currentEditObject with "true" (to disable terrain height forcing and setting fixed height flag).
+                    yield return new CodeInstruction(OpCodes.Pop);
+                    yield return new CodeInstruction(OpCodes.Ldc_I4_1);
+                    continue;
+                }
+
+                yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Fixes a RaycastInput to implement tree snapping.
+        /// </summary>
+        /// <param name="raycast">Raycast to fix.</param>
+        private static void TreeSnappingRaycast(ref RaycastInput raycast)
+        {
+            raycast.m_ignoreBuildingFlags = Building.Flags.None;
+            raycast.m_ignoreNodeFlags = NetNode.Flags.None;
+            raycast.m_ignoreSegmentFlags = NetSegment.Flags.None;
+            raycast.m_buildingService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
+            raycast.m_netService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
+            raycast.m_netService2 = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
         }
     }
 }
