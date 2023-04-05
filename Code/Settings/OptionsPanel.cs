@@ -52,6 +52,13 @@ namespace TreeControl
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
             currentY += GroupMargin;
 
+            // Hide on load check.
+            UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
+            hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
+            hideOnLoadCheck.isChecked = TreeInstancePatches.HideOnLoad;
+            hideOnLoadCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.HideOnLoad = isChecked; };
+            currentY += GroupMargin;
+
             // Update on terrain change checkboxes.
             UICheckBox terrainUpdateCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("TERRAIN_UPDATE"));
             terrainUpdateCheck.tooltip = Translations.Translate("TERRAIN_UPDATE_TIP");
@@ -63,14 +70,7 @@ namespace TreeControl
             keepAboveGroundCheck.tooltip = Translations.Translate("KEEP_ABOVEGROUND_TIP");
             keepAboveGroundCheck.isChecked = TreeInstancePatches.KeepAboveGround;
             keepAboveGroundCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.KeepAboveGround = isChecked; };
-            currentY += keepAboveGroundCheck.height + 20f;
-
-            // Hide on load check.
-            UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(this, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
-            hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
-            hideOnLoadCheck.isChecked = TreeInstancePatches.HideOnLoad;
-            hideOnLoadCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.HideOnLoad = isChecked; };
-            currentY += GroupMargin;
+            currentY += keepAboveGroundCheck.height + GroupMargin;
 
             // Key options.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
@@ -83,6 +83,20 @@ namespace TreeControl
             anarchyKeyMapping.Binding = UIThreading.AnarchyKey;
             anarchyKeyMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += anarchyKeyMapping.Panel.height + Margin;
+
+            // Raise elevation key control.
+            OptionsKeymapping elevationUpMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            elevationUpMapping.Label = Translations.Translate("KEY_ELEVATION_UP");
+            elevationUpMapping.Binding = UIThreading.ElevationUpKey;
+            elevationUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += elevationUpMapping.Panel.height + Margin;
+
+            // Lower elevation key control.
+            OptionsKeymapping elevationDownMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            elevationDownMapping.Label = Translations.Translate("KEY_ELEVATION_DOWN");
+            elevationDownMapping.Binding = UIThreading.ElevationDownKey;
+            elevationDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += elevationDownMapping.Panel.height + Margin;
         }
     }
 }

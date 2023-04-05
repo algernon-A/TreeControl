@@ -47,6 +47,18 @@ namespace TreeControl
         public Keybinding AnarchyKey { get => UIThreading.AnarchyKey; set => UIThreading.AnarchyKey = value; }
 
         /// <summary>
+        /// Gets or sets the raise elevation key.
+        /// </summary>
+        [XmlElement("ElevationUpKey")]
+        public Keybinding ElevationUpKey { get => UIThreading.ElevationUpKey; set => UIThreading.ElevationUpKey = value; }
+
+        /// <summary>
+        /// Gets or sets the lower elevation key.
+        /// </summary>
+        [XmlElement("ElevationDownKey")]
+        public Keybinding ElevationDownKey { get => UIThreading.ElevationDownKey; set => UIThreading.ElevationDownKey = value; }
+
+        /// <summary>
         /// Loads settings from file.
         /// </summary>
         internal static void Load() => XMLFileUtils.Load<ModSettings>(SettingsFileName);

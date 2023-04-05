@@ -9,30 +9,41 @@ namespace TreeControl.Patches
     using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
+    using ColossalFramework;
     using HarmonyLib;
+    using UnityEngine;
     using static ToolBase;
 
     /// <summary>
-    /// Harmony patch to implement tree anarchy.
+    /// Harmony patches to implement tree anarchy and snapping.
     /// </summary>
     [HarmonyPatch(typeof(TreeTool))]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
-    public static class TreeToolPatches
+    internal static class TreeToolPatches
     {
         /// <summary>
-        /// Harmony pre-emptive prefix to TreeTool.CheckPlacementErrors to implement tree anarchy.
+        /// Default elevation adjustment factor.
         /// </summary>
-        /// <param name="__result">Original method result.</param>
-        /// <returns>False (don't execute original method) if anarchy is enabled, true otherwise.</returns>
-        [HarmonyPatch(nameof(TreeTool.CheckPlacementErrors))]
-        [HarmonyPrefix]
-        public static bool CheckPlacementErrorsPrefix(out ToolErrors __result)
-        {
-            // Set default original result to no errors.
-            __result = ToolErrors.None;
+        internal const float DefaultElevationAdjustment = 0f;
 
-            // If anarchy isn't enabled, go on to execute original method (will override default original result assigned above).
-            return !TreeInstancePatches.AnarchyEnabled;
+        // Tree elevation adjustment.
+        private static float s_elevationAdjustment = DefaultElevationAdjustment;
+
+        /// <summary>
+        /// Gets or sets the current elevation adjustment.
+        /// </summary>
+        internal static float ElevationAdjustment
+        {
+            get => s_elevationAdjustment;
+
+            set
+            {
+                // Only change value if a tree is selected.
+                if (Singleton<ToolController>.instance.CurrentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
+                {
+                    s_elevationAdjustment = value;
+                }
+            }
         }
 
         /// <summary>
@@ -42,10 +53,13 @@ namespace TreeControl.Patches
         /// <returns>Modified ILCode.</returns>
         [HarmonyPatch(nameof(TreeTool.SimulationStep))]
         [HarmonyTranspiler]
-        internal static IEnumerable<CodeInstruction> SimulationStepTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> SimulationStepTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // Targeting m_currentEditObject alterations.
             FieldInfo currentEditObject = AccessTools.Field(typeof(RaycastOutput), nameof(RaycastOutput.m_currentEditObject));
+
+            // Targeting allocation of m_mousePosition.
+            FieldInfo mousePosition = AccessTools.Field(typeof(TreeTool), "m_mousePosition");
 
             foreach (CodeInstruction instruction in instructions)
             {
@@ -62,13 +76,35 @@ namespace TreeControl.Patches
                 else if (instruction.LoadsField(currentEditObject))
                 {
                     // Replace calls to output.m_currentEditObject with "true" (to disable terrain height forcing and setting fixed height flag).
+                    Logging.Message("found m_currentEditObject");
                     yield return new CodeInstruction(OpCodes.Pop);
                     yield return new CodeInstruction(OpCodes.Ldc_I4_1);
                     continue;
                 }
+                else if (instruction.StoresField(mousePosition))
+                {
+                    // Adjust mouse position by current elevation adjustment.
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeToolPatches), nameof(ApplyElevationAdjustment)));
+                }
 
                 yield return instruction;
             }
+        }
+
+        /// <summary>
+        /// Harmony pre-emptive prefix to TreeTool.CheckPlacementErrors to implement tree anarchy.
+        /// </summary>
+        /// <param name="__result">Original method result.</param>
+        /// <returns>False (don't execute original method) if anarchy is enabled, true otherwise.</returns>
+        [HarmonyPatch(nameof(TreeTool.CheckPlacementErrors))]
+        [HarmonyPrefix]
+        private static bool CheckPlacementErrorsPrefix(out ToolErrors __result)
+        {
+            // Set default original result to no errors.
+            __result = ToolErrors.None;
+
+            // If anarchy isn't enabled, go on to execute original method (will override default original result assigned above).
+            return !TreeInstancePatches.AnarchyEnabled;
         }
 
         /// <summary>
@@ -83,6 +119,18 @@ namespace TreeControl.Patches
             raycast.m_buildingService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
             raycast.m_netService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
             raycast.m_netService2 = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
+        }
+
+        /// <summary>
+        /// Adjusts the provided mouse position by the current elevation adjustment.
+        /// </summary>
+        /// <param name="mousePosition">Current mouse position.</param>
+        /// <returns>Position adjusted for elevation.</returns>
+        private static Vector3 ApplyElevationAdjustment(Vector3 mousePosition)
+        {
+            // Apply elevation adjustment.
+            mousePosition.y += s_elevationAdjustment;
+            return mousePosition;
         }
     }
 }

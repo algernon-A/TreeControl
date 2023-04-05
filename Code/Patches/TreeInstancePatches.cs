@@ -20,7 +20,7 @@ namespace TreeControl.Patches
     /// </summary>
     [HarmonyPatch(typeof(TreeInstance))]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
-    public static class TreeInstancePatches
+    internal static class TreeInstancePatches
     {
         // Anarchy flags.
         private static bool s_anarchyEnabled = false;
@@ -58,7 +58,7 @@ namespace TreeControl.Patches
         /// <returns>Always false (never execute original method).</returns>
         [HarmonyPatch(nameof(TreeInstance.GrowState), MethodType.Setter)]
         [HarmonyPrefix]
-        public static bool SetGrowState(ref TreeInstance __instance, int value)
+        private static bool SetGrowState(ref TreeInstance __instance, int value)
         {
             int thisValue = value;
 
