@@ -23,8 +23,7 @@ namespace TreeControl.Patches
         /// <returns>List of target methods to patch.</returns>
         internal static IEnumerable<MethodBase> TargetMethods()
         {
-            // Vanilla game panels.
-            //yield return AccessTools.Method(typeof(BeautificationPanel), "OnButtonClicked");
+            // Vanilla game panel.
             yield return AccessTools.Method(typeof(LandscapingPanel), "OnButtonClicked");
 
             // Natural resources brush (detours BeautificationGroupPanel).

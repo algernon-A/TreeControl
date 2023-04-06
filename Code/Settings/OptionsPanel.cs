@@ -74,7 +74,7 @@ namespace TreeControl
 
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(this, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
-            currentY += swayFactorSlider.parent.height + 20f;
+            currentY += swayFactorSlider.parent.height + 15f;
 
             // Tree LOD detail.
             string[] lodDetailLevels = new string[(int)TreeLODControl.Resolution.NumResolutions]
@@ -87,7 +87,7 @@ namespace TreeControl
                 };
             UIDropDown lodDropDown = UIDropDowns.AddPlainDropDown(this, LeftMargin, currentY, Translations.Translate("LOD_DETAIL"), lodDetailLevels, (int)TreeLODControl.CurrentResolution, 350f);
             lodDropDown.eventSelectedIndexChanged += (c, index) => TreeLODControl.CurrentResolution = (TreeLODControl.Resolution)index;
-            currentY += lodDropDown.parent.height + GroupMargin;
+            currentY += lodDropDown.parent.height + 20f;
 
             // Key options.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
