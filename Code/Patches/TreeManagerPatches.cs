@@ -28,6 +28,9 @@ namespace TreeControl.Patches
             {
                 __instance.m_trees.m_buffer[tree].FixedHeight = true;
             }
+
+            // Record scale.
+            TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;
         }
     }
 }

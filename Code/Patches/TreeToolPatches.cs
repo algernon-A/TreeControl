@@ -22,12 +22,38 @@ namespace TreeControl.Patches
     internal static class TreeToolPatches
     {
         /// <summary>
+        /// Default tree scaling factor.
+        /// </summary>
+        internal const float DefaultScale = 1.0f;
+
+        /// <summary>
         /// Default elevation adjustment factor.
         /// </summary>
         internal const float DefaultElevationAdjustment = 0f;
 
+        // Tree scaling factor.
+        private static float s_scaling = DefaultScale;
+
         // Tree elevation adjustment.
         private static float s_elevationAdjustment = DefaultElevationAdjustment;
+
+        /// <summary>
+        /// Gets or sets the current tree scaling factor.
+        /// </summary>
+        internal static float Scaling
+        {
+            get => s_scaling;
+
+            set
+            {
+                // Only change value if a tree is selected.
+                if (Singleton<ToolController>.instance.CurrentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
+                {
+                    // Enforce minimum bound.
+                    s_scaling = Mathf.Max(0.01f, value);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the current elevation adjustment.
@@ -43,6 +69,29 @@ namespace TreeControl.Patches
                 {
                     s_elevationAdjustment = value;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Harmony Transpiler for TreeTool.RenderGeometry to implement tree scaling.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch(nameof(TreeTool.RenderGeometry))]
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> RenderGeometryTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            // Looking for stloc.s 4, which stores the previewed tree's scale.
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 4)
+                {
+                    // Multiply the calculated value by our scaling factor before storing.
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeToolPatches), nameof(s_scaling)));
+                    yield return new CodeInstruction(OpCodes.Mul);
+                }
+
+                yield return instruction;
             }
         }
 

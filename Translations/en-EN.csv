@@ -14,3 +14,5 @@
 "KEY_ANARCHY","Toggle tree anarchy","Options panel key setting text."
 "KEY_ELEVATION_UP","Raise tree","Options panel key setting text."
 "KEY_ELEVATION_DOWN","Lower tree","Options panel key setting text."
+"KEY_SCALE_UP","Increase tree scale","Options panel key setting text."
+"KEY_SCALE_DOWN","Decrease tree scale","Options panel key setting text."

@@ -37,10 +37,11 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony postfix patch to reset elevation adjustment when a new tree is selected.
+        /// Harmony postfix patch to reset scaling and elevation adjustment when a new tree is selected.
         /// </summary>
         internal static void Postfix()
         {
+            TreeToolPatches.Scaling = TreeToolPatches.DefaultScale;
             TreeToolPatches.ElevationAdjustment = TreeToolPatches.DefaultElevationAdjustment;
         }
     }

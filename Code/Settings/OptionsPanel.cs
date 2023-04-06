@@ -95,6 +95,20 @@ namespace TreeControl
             elevationUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += elevationUpMapping.Panel.height + Margin;
 
+            // Upscaling key control.
+            OptionsKeymapping scaleUpMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            scaleUpMapping.Label = Translations.Translate("KEY_SCALE_UP");
+            scaleUpMapping.Binding = UIThreading.ScaleUpKey;
+            scaleUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += scaleUpMapping.Panel.height + Margin;
+
+            // Downscaling key control.
+            OptionsKeymapping scaleDownMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            scaleDownMapping.Label = Translations.Translate("KEY_SCALE_DOWN");
+            scaleDownMapping.Binding = UIThreading.ScaleDownKey;
+            scaleDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += scaleDownMapping.Panel.height + GroupMargin;
+
             // Lower elevation key control.
             OptionsKeymapping elevationDownMapping = this.gameObject.AddComponent<OptionsKeymapping>();
             elevationDownMapping.Label = Translations.Translate("KEY_ELEVATION_DOWN");

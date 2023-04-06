@@ -32,6 +32,9 @@ namespace TreeControl.Patches
         /// </summary>
         internal const float MaxSwayFactor = 1f;
 
+        // Tree scaling data.
+        private static float[] s_scalingData;
+
         // Anarchy flags.
         private static bool s_anarchyEnabled = false;
         private static bool s_hideOnLoad = true;
@@ -42,6 +45,29 @@ namespace TreeControl.Patches
 
         // Tree swaying.
         private static float s_swayFactor = MinSwayFactor;
+
+        /// <summary>
+        /// Gets the tree scaling data array.
+        /// </summary>
+        internal static float[] ScalingArray
+        {
+            get
+            {
+                // Create the scaling array if it isn't already created.
+                if (s_scalingData == null)
+                {
+                    s_scalingData = new float[Singleton<TreeManager>.instance.m_trees.m_buffer.Length];
+
+                    // Default initial scale is 1.
+                    for (int i = 0; i < s_scalingData.Length; ++i)
+                    {
+                        s_scalingData[i] = 1.0f;
+                    }
+                }
+
+                return s_scalingData;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
@@ -153,7 +179,60 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony transpiler for TreeInstance.PopulateGroupData to implement tree movement control.
+        /// Harmony transpiler for TreeInstance.PopulateGroupData (overload 1) to implement tree scaling.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch(nameof(TreeInstance.PopulateGroupData))]
+        [HarmonyPatch(
+            new Type[]
+            {
+                typeof(uint),
+                typeof(int),
+                typeof(int),
+                typeof(int),
+                typeof(Vector3),
+                typeof(RenderGroup.MeshData),
+                typeof(Vector3),
+                typeof(Vector3),
+                typeof(float),
+                typeof(float),
+            },
+            new ArgumentType[]
+            {
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Normal,
+                ArgumentType.Normal,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+                ArgumentType.Ref,
+            })]
+        [HarmonyTranspiler]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "Long Harmony annotation")]
+        private static IEnumerable<CodeInstruction> PopulateGroupData1Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            // Looking for stloc.s 4, which is the scale to be rendered.
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 4)
+                {
+                    // Multiply the calculated value by our scaling factor before storing.
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_scalingData)));
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
+                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(float));
+                    yield return new CodeInstruction(OpCodes.Mul);
+                }
+
+                yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Harmony transpiler for TreeInstance.PopulateGroupData (overload 2) to implement tree movement control.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
@@ -193,7 +272,7 @@ namespace TreeControl.Patches
             })]
         [HarmonyTranspiler]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:Parameter should not span multiple lines", Justification = "Long Harmony annotation")]
-        private static IEnumerable<CodeInstruction> PopulateGroupDataTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> PopulateGroupData2Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             // Windspeed.
             MethodInfo getWindSpeed = AccessTools.Method(typeof(WeatherManager), nameof(WeatherManager.GetWindSpeed), new Type[] { typeof(Vector3) });
@@ -216,13 +295,38 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony transpiler for TreeInstance.RenderInstance to implement random tree rotation and tree movement control.
+        /// Harmony transpiler for TreeInstance.RenderInstance (overload 1) to implement prop scaling.
+        /// </summary>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Modified ILCode.</returns>
+        [HarmonyPatch(nameof(TreeInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(uint), typeof(int) })]
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> RenderInstance1Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            // Looking for stloc.3, which is the scale to be rendered.
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Stloc_3)
+                {
+                    // Multiply the calculated value by our scaling factor before storing.
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_scalingData)));
+                    yield return new CodeInstruction(OpCodes.Ldarg_2);
+                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(float));
+                    yield return new CodeInstruction(OpCodes.Mul);
+                }
+
+                yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Harmony transpiler for TreeInstance.RenderInstance (overload 2) to implement random tree rotation and tree movement control.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
         [HarmonyPatch(nameof(TreeInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) })]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> RenderInstanceTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> RenderInstance2Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             // Quaternion.identity getter.
             MethodInfo qIdentity = AccessTools.PropertyGetter(typeof(Quaternion), nameof(Quaternion.identity));
