@@ -11,6 +11,8 @@ namespace TreeControl
     using ICities;
     using TreeControl.Patches;
 
+    using UnityEngine;
+
     /// <summary>
     /// Main loading class: the mod runs from here.
     /// </summary>
@@ -44,6 +46,9 @@ namespace TreeControl
 
             // Activate display label.
             StatusLabel.CreateLabel();
+
+            // Assign tree LOD resolution.
+            TreeLODControl.SetLODResolution();
         }
     }
 }

@@ -70,11 +70,24 @@ namespace TreeControl
             keepAboveGroundCheck.tooltip = Translations.Translate("KEEP_ABOVEGROUND_TIP");
             keepAboveGroundCheck.isChecked = TreeInstancePatches.KeepAboveGround;
             keepAboveGroundCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.KeepAboveGround = isChecked; };
-            currentY += keepAboveGroundCheck.height + GroupMargin;
+            currentY += keepAboveGroundCheck.height + 20f;
 
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(this, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
-            currentY += swayFactorSlider.parent.height + GroupMargin;
+            currentY += swayFactorSlider.parent.height + 20f;
+
+            // Tree LOD detail.
+            string[] lodDetailLevels = new string[(int)TreeLODControl.Resolution.NumResolutions]
+                {
+                    Translations.Translate("DETAIL_LOW"),
+                    Translations.Translate("DETAIL_MED"),
+                    Translations.Translate("DETAIL_HIGH"),
+                    Translations.Translate("DETAIL_ULTRA"),
+                    Translations.Translate("DETAIL_INSANE"),
+                };
+            UIDropDown lodDropDown = UIDropDowns.AddPlainDropDown(this, LeftMargin, currentY, Translations.Translate("LOD_DETAIL"), lodDetailLevels, (int)TreeLODControl.CurrentResolution, 350f);
+            lodDropDown.eventSelectedIndexChanged += (c, index) => TreeLODControl.CurrentResolution = (TreeLODControl.Resolution)index;
+            currentY += lodDropDown.parent.height + GroupMargin;
 
             // Key options.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
@@ -114,7 +127,7 @@ namespace TreeControl
             scaleDownMapping.Label = Translations.Translate("KEY_SCALE_DOWN");
             scaleDownMapping.Binding = UIThreading.ScaleDownKey;
             scaleDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
-            currentY += scaleDownMapping.Panel.height + GroupMargin;
+            currentY += scaleDownMapping.Panel.height + 20f;
 
             UISlider keyDelaySlider = UISliders.AddPlainSliderWithValue(this, LeftMargin, currentY, Translations.Translate("REPEAT_DELAY"), 0.1f, 1.0f, 0.05f, UIThreading.KeyRepeatDelay);
             keyDelaySlider.eventValueChanged += (c, value) => UIThreading.KeyRepeatDelay = value;

@@ -30,6 +30,12 @@ namespace TreeControl
         public float SwayFactor { get => TreeInstancePatches.SwayFactor; set => TreeInstancePatches.SwayFactor = value; }
 
         /// <summary>
+        /// Gets or sets the tree sway factor.
+        /// </summary>
+        [XmlElement("LODResolution")]
+        public TreeLODControl.Resolution LODResolution { get => TreeLODControl.CurrentResolution; set => TreeLODControl.CurrentResolution = value; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
         /// </summary>
         public bool HideOnLoad { get => TreeInstancePatches.HideOnLoad; set => TreeInstancePatches.HideOnLoad = value; }
