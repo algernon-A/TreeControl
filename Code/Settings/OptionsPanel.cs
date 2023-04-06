@@ -95,6 +95,13 @@ namespace TreeControl
             elevationUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += elevationUpMapping.Panel.height + Margin;
 
+            // Lower elevation key control.
+            OptionsKeymapping elevationDownMapping = this.gameObject.AddComponent<OptionsKeymapping>();
+            elevationDownMapping.Label = Translations.Translate("KEY_ELEVATION_DOWN");
+            elevationDownMapping.Binding = UIThreading.ElevationDownKey;
+            elevationDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += elevationDownMapping.Panel.height + Margin;
+
             // Upscaling key control.
             OptionsKeymapping scaleUpMapping = this.gameObject.AddComponent<OptionsKeymapping>();
             scaleUpMapping.Label = Translations.Translate("KEY_SCALE_UP");
@@ -109,12 +116,8 @@ namespace TreeControl
             scaleDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += scaleDownMapping.Panel.height + GroupMargin;
 
-            // Lower elevation key control.
-            OptionsKeymapping elevationDownMapping = this.gameObject.AddComponent<OptionsKeymapping>();
-            elevationDownMapping.Label = Translations.Translate("KEY_ELEVATION_DOWN");
-            elevationDownMapping.Binding = UIThreading.ElevationDownKey;
-            elevationDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
-            currentY += elevationDownMapping.Panel.height + Margin;
+            UISlider keyDelaySlider = UISliders.AddPlainSliderWithValue(this, LeftMargin, currentY, Translations.Translate("REPEAT_DELAY"), 0.1f, 1.0f, 0.05f, UIThreading.KeyRepeatDelay);
+            keyDelaySlider.eventValueChanged += (c, value) => UIThreading.KeyRepeatDelay = value;
         }
     }
 }

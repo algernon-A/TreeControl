@@ -295,7 +295,7 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony transpiler for TreeInstance.RenderInstance (overload 1) to implement prop scaling.
+        /// Harmony transpiler for TreeInstance.RenderInstance (overload 1) to implement tree scaling.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
@@ -370,7 +370,7 @@ namespace TreeControl.Patches
         /// </summary>
         /// <param name="terrainY">Terrain elevation.</param>
         /// <param name="treeY">Tree elevation.</param>
-        /// <returns>Calculated prop Y coordinate per current settings.</returns>
+        /// <returns>Calculated tree Y coordinate per current settings.</returns>
         private static ushort CalculateElevation(ushort terrainY, ushort treeY)
         {
             if (s_updateOnTerrain)

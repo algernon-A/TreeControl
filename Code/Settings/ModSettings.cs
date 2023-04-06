@@ -53,6 +53,18 @@ namespace TreeControl
         public Keybinding AnarchyKey { get => UIThreading.AnarchyKey; set => UIThreading.AnarchyKey = value; }
 
         /// <summary>
+        /// Gets or sets the tree upscaling key.
+        /// </summary>
+        [XmlElement("ScaleUpKey")]
+        public Keybinding ScaleUpKey { get => UIThreading.ScaleUpKey; set => UIThreading.ScaleUpKey = value; }
+
+        /// <summary>
+        /// Gets or sets the tree upscaling key.
+        /// </summary>
+        [XmlElement("ScaleDownKey")]
+        public Keybinding ScaleDownKey { get => UIThreading.ScaleDownKey; set => UIThreading.ScaleDownKey = value; }
+
+        /// <summary>
         /// Gets or sets the raise elevation key.
         /// </summary>
         [XmlElement("ElevationUpKey")]
@@ -63,6 +75,12 @@ namespace TreeControl
         /// </summary>
         [XmlElement("ElevationDownKey")]
         public Keybinding ElevationDownKey { get => UIThreading.ElevationDownKey; set => UIThreading.ElevationDownKey = value; }
+
+        /// <summary>
+        /// Gets or sets the key repeat delay.
+        /// </summary>
+        [XmlElement("KeyRepeatDelay")]
+        public float KeyRepeatDelay { get => UIThreading.KeyRepeatDelay; set => UIThreading.KeyRepeatDelay = value; }
 
         /// <summary>
         /// Loads settings from file.

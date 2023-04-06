@@ -12,7 +12,7 @@ namespace TreeSnapping
     using ICities;
 
     /// <summary>
-    /// Serialization for prop snapping data.
+    /// Serialization for tree snapping data.
     /// </summary>
     public class SerializableData : SerializableDataExtensionBase
     {
