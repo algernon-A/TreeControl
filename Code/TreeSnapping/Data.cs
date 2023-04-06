@@ -18,7 +18,7 @@ namespace TreeSnapping
     public sealed class Data : IDataContainer
     {
         /// <summary>
-        /// Saves prop snapping data (prop heights) to savegame.
+        /// Saves tree snapping data (tree heights) to savegame.
         /// </summary>
         /// <param name="serializer">DataSerializer instance.</param>
         public void Serialize(DataSerializer serializer)
@@ -28,11 +28,11 @@ namespace TreeSnapping
                 // Local reference.
                 TreeInstance[] treeBuffer = Singleton<TreeManager>.instance.m_trees.m_buffer;
 
-                // Prop buffer length.
+                // Tree buffer length.
                 int bufferSize = treeBuffer.Length;
                 serializer.WriteInt32(bufferSize);
 
-                // Write prop heights.
+                // Write tree heights.
                 EncodedArray.UShort heights = EncodedArray.UShort.BeginWrite(serializer);
                 for (int i = 0; i < bufferSize; ++i)
                 {
@@ -59,7 +59,7 @@ namespace TreeSnapping
                 TreeManager treeManager = Singleton<TreeManager>.instance;
                 TreeInstance[] treeBuffer = treeManager.m_trees.m_buffer;
 
-                // Read prop heights.
+                // Read tree heights.
                 int bufferSize = serializer.ReadInt32();
                 EncodedArray.UShort heights = EncodedArray.UShort.BeginRead(serializer);
                 for (uint i = 0; i < bufferSize; ++i)

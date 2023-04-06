@@ -45,17 +45,17 @@ namespace TreeControl
         internal static Keybinding AnarchyKey { get => s_anarchyKey; set => s_anarchyKey = value; }
 
         /// <summary>
-        /// Gets or sets the prop upscaling key.
+        /// Gets or sets the raise elevation key.
         /// </summary>
         internal static Keybinding ElevationUpKey { get => s_elevationUpKey; set => s_elevationUpKey = value; }
 
         /// <summary>
-        /// Gets or sets the prop downscaling key.
+        /// Gets or sets the lower elevation key.
         /// </summary>
         internal static Keybinding ElevationDownKey { get => s_elevationDownKey; set => s_elevationDownKey = value; }
 
         /// <summary>
-        /// Gets or sets the prop scaling key delay.
+        /// Gets or sets the key delay.
         /// </summary>
         internal static float KeyRepeatDelay { get => s_initialRepeatDelay; set => s_initialRepeatDelay = value; }
 

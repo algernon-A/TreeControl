@@ -15,7 +15,7 @@ namespace TreeControl.Patches
     internal static class TreeManagerPatches
     {
         /// <summary>
-        /// Harmony postfix to TreeManager.CreateTree to implement prop scaling.
+        /// Harmony postfix to TreeManager.CreateTree to implement tree snapping.
         /// </summary>>
         /// <param name="__instance">TreeManager instance.</param>
         /// <param name="tree">ID of newly-created tree.</param>

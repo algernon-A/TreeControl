@@ -32,12 +32,6 @@ namespace TreeSnapping
         {
             base.OnLoadData();
 
-            // Don't load data if not in-game.
-            if (ToolManager.instance.m_properties.m_mode != ItemClass.Availability.Game)
-            {
-                return;
-            }
-
             // Don't read data if the DataID isn't present.
             if (!serializableDataManager.EnumerateData().Contains(DataID))
             {
@@ -59,12 +53,6 @@ namespace TreeSnapping
         public override void OnSaveData()
         {
             base.OnSaveData();
-
-            // Don't save data if not in-game.
-            if (ToolManager.instance.m_properties.m_mode != ItemClass.Availability.Game)
-            {
-                return;
-            }
 
             using (MemoryStream stream = new MemoryStream())
             {

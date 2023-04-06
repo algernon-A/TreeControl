@@ -66,7 +66,7 @@ namespace TreeControl.Patches
                 // Looking for new RaycastInput constructor call.
                 if (instruction.operand is ConstructorInfo constructor && constructor.DeclaringType == typeof(RaycastInput))
                 {
-                    // Change the RaycastInput for prop snapping.
+                    // Change the RaycastInput for tree snapping.
                     Logging.Message("found raycast constructor");
                     yield return instruction;
                     yield return new CodeInstruction(OpCodes.Ldloca_S, 0);
