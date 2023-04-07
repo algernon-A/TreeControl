@@ -24,6 +24,12 @@ namespace TreeControl
         private static readonly string SettingsFileName = Path.Combine(ColossalFramework.IO.DataLocation.localApplicationData, "TreeControl.xml");
 
         /// <summary>
+        /// Gets or sets the currently active default custom tree limit.
+        /// </summary>
+        [XmlElement("TreeLimit")]
+        public int TreeLimit { get => TreeManagerDataPatches.CustomTreeLimit; set => TreeManagerDataPatches.CustomTreeLimit = value; }
+
+        /// <summary>
         /// Gets or sets the tree sway factor.
         /// </summary>
         [XmlElement("TreeSwayFactor")]
