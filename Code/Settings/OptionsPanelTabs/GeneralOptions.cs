@@ -88,6 +88,12 @@ namespace TreeControl
             UIDropDown lodDropDown = UIDropDowns.AddPlainDropDown(panel, LeftMargin, currentY, Translations.Translate("LOD_DETAIL"), lodDetailLevels, (int)TreeLODControl.CurrentResolution, 350f);
             lodDropDown.eventSelectedIndexChanged += (c, index) => TreeLODControl.CurrentResolution = (TreeLODControl.Resolution)index;
             currentY += lodDropDown.parent.height + 20f;
+
+            // Hide on load check.
+            UICheckBox lockForestryCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LOCK_FORESTRY"));
+            lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_TIP");
+            lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestry;
+            lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestry = isChecked; };
         }
     }
 }

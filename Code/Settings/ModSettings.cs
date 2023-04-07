@@ -59,6 +59,12 @@ namespace TreeControl
         public bool KeepAboveGround { get => TreeInstancePatches.KeepAboveGround; set => TreeInstancePatches.KeepAboveGround = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether forestry resources should be locked.
+        /// </summary>
+        [XmlElement("LockForestry")]
+        public bool LockForestry { get => NaturalResourceManagerPatches.LockForestry; set => NaturalResourceManagerPatches.LockForestry = value; }
+
+        /// <summary>
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
         [XmlElement("AnarchyKey")]
