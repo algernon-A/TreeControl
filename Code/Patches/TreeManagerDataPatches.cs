@@ -153,6 +153,10 @@ namespace TreeControl.Patches
                 if (CustomTreeLimit <= MAX_TREE_COUNT)
                 {
                     Logging.KeyMessage("not using expanded tree array");
+
+                    // Ensure tree scaling array is initialized.
+                    TreeInstancePatches.InitializeScalingBuffer(MAX_TREE_COUNT);
+
                     return oldBuffer;
                 }
 
@@ -182,7 +186,12 @@ namespace TreeControl.Patches
 
             // Assign new array and create new updated tree array.
             instance.m_trees = newTreeArray;
-            instance.m_updatedTrees = new ulong[newTreeArray.m_buffer.Length >> 6];
+            int newBufferSize = newTreeArray.m_buffer.Length;
+            instance.m_updatedTrees = new ulong[newBufferSize >> 6];
+
+            // Ensure tree scaling array is initialized.
+            TreeInstancePatches.InitializeScalingBuffer(newBufferSize);
+
             return newTreeArray.m_buffer;
         }
     }

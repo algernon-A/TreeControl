@@ -24,19 +24,6 @@ namespace TreeControl
         protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor };
 
         /// <summary>
-        /// Performs any actions upon successful creation of the mod.
-        /// E.g. Can be used to patch any other mods.
-        /// </summary>
-        /// <param name="loading">Loading mode (e.g. game or editor).</param>
-        protected override void CreatedActions(ILoading loading)
-        {
-            base.CreatedActions(loading);
-
-            // Ensure tree scaling array is initialized.
-            Logging.KeyMessage("tree scaling buffer size is ", TreeInstancePatches.ScalingArray.Length);
-        }
-
-        /// <summary>
         /// Performs any actions upon successful level loading completion.
         /// </summary>
         /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.).</param>

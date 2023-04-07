@@ -47,9 +47,11 @@ namespace TreeScaling
         /// <param name="serializer">DataSerializer instance.</param>
         public void Deserialize(DataSerializer serializer)
         {
+            Logging.KeyMessage("deserializing tree scaling data");
+
             try
             {
-                // Write data version and array size (currently ignored).
+                // Read data version (currently ignored).
                 int version = serializer.ReadInt32();
                 if (version > DataVersion)
                 {
@@ -58,22 +60,24 @@ namespace TreeScaling
                 }
 
                 // Read array length.
-                int length = serializer.ReadInt32();
-                if (length != ScalingArray.Length)
-                {
-                    Logging.Error("invalid scaling data length ", length, "; aborting read");
-                    return;
-                }
+                int dataSize = serializer.ReadInt32();
+
+                // Get tree buffer size.
+                int bufferSize = ScalingArray.Length;
 
                 // Read each tree scale entry.
-                for (int i = 0; i < ScalingArray.Length; ++i)
+                for (int i = 0; i < dataSize; ++i)
                 {
                     float scale = serializer.ReadFloat();
 
-                    // Check for invalid data and set to 1.
-                    if (scale == 0f | scale == float.NaN)
+                    // Bounds check on buffer length.
+                    if (i < bufferSize)
                     {
-                        scale = 1f;
+                        // Check for invalid data and set to 1.
+                        if (scale == 0f | scale == float.NaN)
+                        {
+                            scale = 1f;
+                        }
                     }
 
                     ScalingArray[i] = scale;

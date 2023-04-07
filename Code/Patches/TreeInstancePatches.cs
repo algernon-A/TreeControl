@@ -49,25 +49,7 @@ namespace TreeControl.Patches
         /// <summary>
         /// Gets the tree scaling data array.
         /// </summary>
-        internal static float[] ScalingArray
-        {
-            get
-            {
-                // Create the scaling array if it isn't already created.
-                if (s_scalingData == null)
-                {
-                    s_scalingData = new float[Singleton<TreeManager>.instance.m_trees.m_buffer.Length];
-
-                    // Default initial scale is 1.
-                    for (int i = 0; i < s_scalingData.Length; ++i)
-                    {
-                        s_scalingData[i] = 1.0f;
-                    }
-                }
-
-                return s_scalingData;
-            }
-        }
+        internal static float[] ScalingArray => s_scalingData;
 
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
@@ -93,6 +75,23 @@ namespace TreeControl.Patches
         /// Gets or sets the tree sway factor.
         /// </summary>
         internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
+
+        /// <summary>
+        /// Initializes the scaling buffer.
+        /// MUST be invoked before referencing the buffer (which includes invokation of TreeInstance.PopulateGroupData on game data deserialization).
+        /// </summary>
+        /// <param name="size">Buffer size to create.</param>
+        internal static void InitializeScalingBuffer(int size)
+        {
+            Logging.Message("creating tree scaling data array of size ", size);
+            s_scalingData = new float[size];
+
+            // Default initial scale is 1.
+            for (int i = 0; i < size; ++i)
+            {
+                s_scalingData[i] = 1.0f;
+            }
+        }
 
         /// <summary>
         /// Harmony pre-emptive prefix for TreeInstance.GrowState setter to implement tree anarchy.

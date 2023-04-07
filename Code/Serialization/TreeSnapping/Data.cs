@@ -53,34 +53,43 @@ namespace TreeSnapping
         /// <param name="serializer">DataSerializer instance.</param>
         public void Deserialize(DataSerializer serializer)
         {
+            Logging.KeyMessage("deserializing tree snapping data");
+
             try
             {
                 // Local reference.
                 TreeManager treeManager = Singleton<TreeManager>.instance;
                 TreeInstance[] treeBuffer = treeManager.m_trees.m_buffer;
+                int bufferSize = treeBuffer.Length;
+
+                // Read tree height data length.
+                int dataSize = serializer.ReadInt32();
 
                 // Read tree heights.
-                int bufferSize = serializer.ReadInt32();
                 EncodedArray.UShort heights = EncodedArray.UShort.BeginRead(serializer);
-                for (uint i = 0; i < bufferSize; ++i)
+                for (uint i = 0; i < dataSize; ++i)
                 {
                     ushort height = heights.Read();
 
-                    // Check for questionable data - ignore 0x0000 and 0xFFFF.
-                    if (height != 0 & height != ushort.MaxValue)
+                    // Bounds check for data size.
+                    if (i < bufferSize)
                     {
-                        treeBuffer[i].m_posY = height;
-
-                        // Need to update the tree render now that we've updated its Y-position.
-                        treeManager.UpdateTree(i);
-                    }
-                    else
-                    {
-                        // Clear the fixed height flag of any tree without valid snapping data.
-                        if (!treeBuffer[i].FixedHeight)
+                        // Check for questionable data - ignore 0x0000 and 0xFFFF.
+                        if (height != 0 & height != ushort.MaxValue)
                         {
-                            treeBuffer[i].FixedHeight = false;
+                            treeBuffer[i].m_posY = height;
+
+                            // Need to update the tree render now that we've updated its Y-position.
                             treeManager.UpdateTree(i);
+                        }
+                        else
+                        {
+                            // Clear the fixed height flag of any tree without valid snapping data.
+                            if (!treeBuffer[i].FixedHeight)
+                            {
+                                treeBuffer[i].FixedHeight = false;
+                                treeManager.UpdateTree(i);
+                            }
                         }
                     }
                 }
