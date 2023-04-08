@@ -21,6 +21,7 @@ namespace TreeControl.Patches
     /// Harmony patches for the game tree manager's data handling to implement expanded tree limits.
     /// </summary>
     [HarmonyPatch(typeof(Data))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     internal static class TreeManagerDataPatches
     {
         /// <summary>
@@ -83,6 +84,75 @@ namespace TreeControl.Patches
                 }
 
                 yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Harmony prefix for TreeManager.Data.Serialize to ensure only burning trees within vanilla buffer range are serialized in base-game data.
+        /// </summary>
+        /// <param name="__state">Original BurningTree fastlist (null if none).</param>
+        [HarmonyPatch(nameof(Data.Serialize))]
+        [HarmonyPrefix]
+        private static void SerializePrefix(out FastList<BurningTree> __state)
+        {
+            // Local references.
+            TreeManager treeManager = Singleton<TreeManager>.instance;
+            FastList<BurningTree> oldBurningTrees = treeManager.m_burningTrees;
+
+            Logging.Message("checking burning trees");
+            if (oldBurningTrees == null)
+            {
+                Logging.Message("null burning tree fastlist; skipping");
+                __state = null;
+                return;
+            }
+
+            // If we have at least one burning tree, sanitise the buffer.
+            int numBurningTrees = oldBurningTrees.m_size;
+            if (numBurningTrees > 0)
+            {
+                Logging.Message("checking burning tree indexes for ", numBurningTrees, " burning trees");
+
+                // Create new burning tree fastlist.
+                FastList<BurningTree> newBurningTrees = new FastList<BurningTree>();
+                newBurningTrees.EnsureCapacity(numBurningTrees);
+
+                // Copy any burning trees with valid vanilla tree indexes to the new fastlist (ignore others).
+                foreach (BurningTree burningTree in oldBurningTrees)
+                {
+                    if (burningTree.m_treeIndex < MAX_TREE_COUNT)
+                    {
+                        newBurningTrees.Add(burningTree);
+                    }
+                    else
+                    {
+                        Logging.Message("clearing burning tree with tree index ", burningTree.m_treeIndex);
+                    }
+                }
+
+                Logging.Message("passed ", newBurningTrees.m_size, " burning trees");
+
+                // Assign sanitised fastlist to the TreeManager for serialization, and pass the original reference to the postfix to restore post-serialization.
+                treeManager.m_burningTrees = newBurningTrees;
+                __state = oldBurningTrees;
+                return;
+            }
+
+            __state = null;
+        }
+
+        /// <summary>
+        /// Harmony postfix for TreeManager.Data.Serialize to restore original burning trees fastlist if the prefix has created a sanitised copy for serialisation.
+        /// </summary>
+        /// <param name="__state">Original BurningTree fastlist to restore (null if none).</param>
+        [HarmonyPatch(nameof(Data.Serialize))]
+        [HarmonyPostfix]
+        private static void SerializePostfix(FastList<BurningTree> __state)
+        {
+            // Restore original burning trees fastlist if one has been provided.
+            if (__state != null)
+            {
+                Singleton<TreeManager>.instance.m_burningTrees = __state;
             }
         }
 
