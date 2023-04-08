@@ -89,6 +89,9 @@ namespace TreeControl.Patches
         /// <param name="size">Buffer size to create.</param>
         internal static void InitializeScalingBuffer(int size)
         {
+            // Local reference.
+            TreeManager treeManager = Singleton<TreeManager>.instance;
+
             Logging.Message("creating tree scaling data array of size ", size);
             s_scalingData = new float[size];
 
@@ -96,6 +99,9 @@ namespace TreeControl.Patches
             for (int i = 0; i < size; ++i)
             {
                 s_scalingData[i] = 1.0f;
+
+                // Update tree after reading scaling data.
+                treeManager.UpdateTree((uint)i);
             }
         }
 
