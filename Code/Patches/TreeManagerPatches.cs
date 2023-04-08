@@ -31,7 +31,6 @@ namespace TreeControl.Patches
             FieldInfo m_trees = AccessTools.Field(typeof(TreeManager), nameof(m_trees));
             FieldInfo m_Buffer = AccessTools.Field(typeof(Array32<TreeInstance>), nameof(Array32<TreeInstance>.m_buffer));
 
-
             // Looking for hardcoded tree limit constants.
             foreach (CodeInstruction instruction in instructions)
             {

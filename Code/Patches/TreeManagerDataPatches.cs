@@ -7,6 +7,7 @@ namespace TreeControl.Patches
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
     using ColossalFramework;
@@ -58,14 +59,14 @@ namespace TreeControl.Patches
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> DeserializeTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            bool inserted = false;
+            MethodInfo getVersion = AccessTools.PropertyGetter(typeof(DataSerializer), nameof(DataSerializer.version));
 
             // Insert call to our custom method immediately before the first stloc.s 19 (start of loop to initialize instances and assign unused).
             foreach (CodeInstruction instruction in instructions)
             {
-                if (!inserted && instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 19)
+                if (instruction.Calls(getVersion))
                 {
-                    Logging.Message("found stloc.s 19");
+                    Logging.Message("found Get:Version");
 
                     yield return new CodeInstruction(OpCodes.Ldloc_0);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeManagerDataPatches), nameof(CustomDeserialize)));
@@ -78,9 +79,6 @@ namespace TreeControl.Patches
 
                     // Update local variable for buffer  with the new buffer.
                     yield return new CodeInstruction(OpCodes.Stloc_1);
-
-                    // We only do this for the first instance.
-                    inserted = true;
                 }
 
                 yield return instruction;

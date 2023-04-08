@@ -78,9 +78,6 @@ namespace TreeSnapping
                         if (height != 0 & height != ushort.MaxValue)
                         {
                             treeBuffer[i].m_posY = height;
-
-                            // Need to update the tree render now that we've updated its Y-position.
-                            treeManager.UpdateTree(i);
                         }
                         else
                         {
@@ -88,7 +85,6 @@ namespace TreeSnapping
                             if (!treeBuffer[i].FixedHeight)
                             {
                                 treeBuffer[i].FixedHeight = false;
-                                treeManager.UpdateTree(i);
                             }
                         }
                     }
