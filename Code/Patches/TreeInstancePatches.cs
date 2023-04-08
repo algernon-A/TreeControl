@@ -158,10 +158,24 @@ namespace TreeControl.Patches
         /// <summary>
         /// Harmony pre-emptive prefix to TreeInstance.CalculateTree to implement tree snapping.
         /// </summary>
+        /// <param name="__instance">TreeInstance instance.</param>
         /// <returns>Always false (never execute original method).</returns>
         [HarmonyPatch(nameof(TreeInstance.CalculateTree))]
         [HarmonyPrefix]
-        private static bool CalculateTreePrefix() => false;
+        private static bool CalculateTreePrefix(ref TreeInstance __instance)
+        {
+            // Only do this for created trees with no recorded Y position
+            if (((__instance.m_flags & (ushort)TreeInstance.Flags.Created) == 1) & __instance.m_posY == 0)
+            {
+                // Move tree to terrain height.
+                Vector3 position = __instance.Position;
+                position.y = Singleton<TerrainManager>.instance.SampleDetailHeight(position);
+                __instance.m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
+            }
+
+            // Don't execute original method.
+            return false;
+        }
 
         /// <summary>
         /// Harmony transpiler for TreeInstance.CheckOverlap to implement tree anarchy.

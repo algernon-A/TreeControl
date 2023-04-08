@@ -24,28 +24,6 @@ namespace TreeScaling
         private const int DataVersion = 0;
 
         /// <summary>
-        /// Deserializes data from a savegame.
-        /// Called by the game on load (including a new game).
-        /// </summary>
-        public override void OnLoadData()
-        {
-            base.OnLoadData();
-
-            // Don't read data if the DataID isn't present.
-            if (!serializableDataManager.EnumerateData().Contains(DataID))
-            {
-                return;
-            }
-
-            byte[] data = serializableDataManager.LoadData(DataID);
-            using (MemoryStream stream = new MemoryStream(data))
-            {
-                // Deserialise data.
-                DataSerializer.Deserialize<Data>(stream, DataSerializer.Mode.Memory);
-            }
-        }
-
-        /// <summary>
         /// Serializes data to the savegame.
         /// Called by the game on save.
         /// </summary>
@@ -61,6 +39,15 @@ namespace TreeScaling
                 // Write to savegame.
                 serializableDataManager.SaveData(DataID, stream.ToArray());
             }
+        }
+
+        /// <summary>
+        /// Deserializes data from a savegame (or initialises new data structures when none available).
+        /// Called by the game on load (including a new game).
+        /// </summary>
+        public override void OnLoadData()
+        {
+            // Deserialization is done at TreeManager.Data.Deserialize (inserted by transpiler).
         }
     }
 }

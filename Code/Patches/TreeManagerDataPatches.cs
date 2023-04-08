@@ -225,6 +225,8 @@ namespace TreeControl.Patches
 
                     // Ensure tree scaling array is initialized.
                     TreeInstancePatches.InitializeScalingBuffer(MAX_TREE_COUNT);
+                    DeserializeScaling();
+                    DeserializeSnapping();
 
                     return oldBuffer;
                 }
@@ -260,8 +262,36 @@ namespace TreeControl.Patches
 
             // Ensure tree scaling array is initialized.
             TreeInstancePatches.InitializeScalingBuffer(newBufferSize);
+            DeserializeScaling();
+            DeserializeSnapping();
 
             return newTreeArray.m_buffer;
+        }
+
+        private static void DeserializeScaling()
+        {
+            if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(TreeScaling.SerializableData.DataID, out byte[] data))
+            {
+                // Yes - load it.
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    Logging.Message("found scaling data");
+                    DataSerializer.Deserialize<TreeScaling.Data>(stream, DataSerializer.Mode.Memory);
+                }
+            }
+        }
+
+        private static void DeserializeSnapping()
+        {
+            if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(TreeSnapping.SerializableData.DataID, out byte[] data))
+            {
+                // Yes - load it.
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    Logging.Message("found snapping data");
+                    DataSerializer.Deserialize<TreeSnapping.Data>(stream, DataSerializer.Mode.Memory);
+                }
+            }
         }
     }
 }

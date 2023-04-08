@@ -25,28 +25,6 @@ namespace TreeSnapping
         private const int DataVersion = 1;
 
         /// <summary>
-        /// Deserializes data from a savegame.
-        /// Called by the game on load (including a new game).
-        /// </summary>
-        public override void OnLoadData()
-        {
-            base.OnLoadData();
-
-            // Don't read data if the DataID isn't present.
-            if (!serializableDataManager.EnumerateData().Contains(DataID))
-            {
-                return;
-            }
-
-            byte[] data = serializableDataManager.LoadData(DataID);
-            using (MemoryStream stream = new MemoryStream(data))
-            {
-                // Deserialise data.
-                DataSerializer.Deserialize<Data>(stream, DataSerializer.Mode.Memory, LegacyTypeConverter);
-            }
-        }
-
-        /// <summary>
         /// Serializes data to the savegame.
         /// Called by the game on save.
         /// </summary>
@@ -65,10 +43,12 @@ namespace TreeSnapping
         }
 
         /// <summary>
-        /// Legacy container type converter.
+        /// Deserializes data from a savegame (or initialises new data structures when none available).
+        /// Called by the game on load (including a new game).
         /// </summary>
-        /// <param name="legacyTypeName">Legacy type name (ignored).</param>
-        /// <returns>ElectricityDataContainer type.</returns>
-        private static Type LegacyTypeConverter(string legacyTypeName) => typeof(Data);
+        public override void OnLoadData()
+        {
+            // Deserialization is done at TreeManager.Data.Deserialize (inserted by transpiler).
+        }
     }
 }
