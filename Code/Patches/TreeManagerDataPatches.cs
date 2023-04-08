@@ -91,8 +91,8 @@ namespace TreeControl.Patches
         /// Harmony prefix for TreeManager.Data.Serialize to ensure only burning trees within vanilla buffer range are serialized in base-game data.
         /// </summary>
         /// <param name="__state">Original BurningTree fastlist (null if none).</param>
-        [HarmonyPatch(nameof(Data.Serialize))]
-        [HarmonyPrefix]
+        // [HarmonyPatch(nameof(Data.Serialize))]
+        // [HarmonyPrefix]
         private static void SerializePrefix(out FastList<BurningTree> __state)
         {
             // Local references.
@@ -145,13 +145,14 @@ namespace TreeControl.Patches
         /// Harmony postfix for TreeManager.Data.Serialize to restore original burning trees fastlist if the prefix has created a sanitised copy for serialisation.
         /// </summary>
         /// <param name="__state">Original BurningTree fastlist to restore (null if none).</param>
-        [HarmonyPatch(nameof(Data.Serialize))]
-        [HarmonyPostfix]
+        // [HarmonyPatch(nameof(Data.Serialize))]
+        // [HarmonyPostfix]
         private static void SerializePostfix(FastList<BurningTree> __state)
         {
             // Restore original burning trees fastlist if one has been provided.
             if (__state != null)
             {
+                Logging.Message("restoring original burning trees");
                 Singleton<TreeManager>.instance.m_burningTrees = __state;
             }
         }

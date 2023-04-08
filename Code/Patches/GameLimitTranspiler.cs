@@ -17,9 +17,6 @@ namespace TreeControl.Patches
     [HarmonyPatch]
     internal static class GameLimitTranspiler
     {
-        // New maximum limit.
-        private const int MaxTreeLimit = 4194304;
-
         /// <summary>
         /// Determines list of target methods to patch - in this case, identified methods with hardcoded tree limits.
         /// </summary>
@@ -78,9 +75,9 @@ namespace TreeControl.Patches
                 if (instruction.opcode == OpCodes.Ldc_I4 && instruction.operand is int thisInt && thisInt == TreeManager.MAX_TREE_COUNT)
                 {
                     // Yes - change operand to our new unit count max.
-                    instruction.operand = MaxTreeLimit;
+                    instruction.operand = TreeManagerDataPatches.MaxCustomTreeLimit;
 
-                    Logging.Message("changed 262144 in ", original.FullDescription(), " to ", MaxTreeLimit);
+                    Logging.Message("changed 262144 in ", original.FullDescription(), " to ", instruction.operand);
 
                     // Set flag.
                     foundTarget = true;

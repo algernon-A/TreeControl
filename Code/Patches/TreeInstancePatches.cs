@@ -155,7 +155,7 @@ namespace TreeControl.Patches
         /// <returns>Always false (never execute original method).</returns>
         [HarmonyPatch(nameof(TreeInstance.CalculateTree))]
         [HarmonyPrefix]
-        private static bool CalculateTreerPrefix() => false;
+        private static bool CalculateTreePrefix() => false;
 
         /// <summary>
         /// Harmony transpiler for TreeInstance.CheckOverlap to implement tree anarchy.
