@@ -40,6 +40,7 @@ namespace TreeControl.Patches
         private static bool s_hideOnLoad = true;
 
         // Update on terrain change.
+        private static bool s_terrainReady = false;
         private static bool s_updateOnTerrain = false;
         private static bool s_keepAboveGround = true;
 
@@ -60,6 +61,11 @@ namespace TreeControl.Patches
         /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
         /// </summary>
         internal static bool HideOnLoad { get => s_hideOnLoad; set => s_hideOnLoad = value; }
+
+        /// <summary>
+        /// Sets a value indicating whether the terrain has been initialized on load.
+        /// </summary>
+        internal static bool TerrainReady { set => s_terrainReady = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.
@@ -372,7 +378,8 @@ namespace TreeControl.Patches
         /// <returns>Calculated tree Y coordinate per current settings.</returns>
         private static ushort CalculateElevation(ushort terrainY, ushort treeY)
         {
-            if (s_updateOnTerrain)
+            // Don't use terrain heights until the terrain is ready.
+            if (s_terrainReady & s_updateOnTerrain)
             {
                 // Default game behaviour - terrain height.
                 // However, only this if the TerrainTool is active, to avoid surface ruining changes triggering a reset of newly-placed trees.

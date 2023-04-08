@@ -36,6 +36,9 @@ namespace TreeControl
 
             // Assign tree LOD resolution.
             TreeLODControl.SetLODResolution();
+
+            // Record terrain as being ready (enable snapping terrain features).
+            TreeInstancePatches.TerrainReady = true;
         }
     }
 }
