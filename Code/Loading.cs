@@ -6,7 +6,6 @@
 namespace TreeControl
 {
     using System.Collections.Generic;
-    using AlgernonCommons;
     using AlgernonCommons.Patching;
     using ICities;
     using TreeControl.Patches;

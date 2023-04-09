@@ -59,15 +59,20 @@ namespace TreeControl.Patches
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> DeserializeTranspiler(IEnumerable<CodeInstruction> instructions)
         {
+            // Data serializer version getter (flags start of burning tree deserialization).
             MethodInfo getVersion = AccessTools.PropertyGetter(typeof(DataSerializer), nameof(DataSerializer.version));
+
+            // TreeInstance.m_posY field (to override automatic initialization to zero)>
+            FieldInfo m_posY = AccessTools.Field(typeof(TreeInstance), nameof(TreeInstance.m_posY));
 
             // Insert call to our custom method immediately before the first stloc.s 19 (start of loop to initialize instances and assign unused).
             foreach (CodeInstruction instruction in instructions)
             {
                 if (instruction.Calls(getVersion))
                 {
+                    // Found DataSerializer.Version getter invocation; insert call to custom deserialize method here.
+                    // This ensures that the correct array size is initialized before tree references are invoked during burning trees deserializatio.
                     Logging.Message("found Get:Version");
-
                     yield return new CodeInstruction(OpCodes.Ldloc_0);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeManagerDataPatches), nameof(CustomDeserialize)));
 
@@ -79,6 +84,14 @@ namespace TreeControl.Patches
 
                     // Update local variable for buffer  with the new buffer.
                     yield return new CodeInstruction(OpCodes.Stloc_1);
+                }
+                else if (instruction.StoresField(m_posY))
+                {
+                    // Found call to store TreeInstance.m_posY; drop this instruction to leave m_posY as tree snapping data deserializer left it.
+                    Logging.Message("found TreeInstance.m_posY store");
+                    yield return new CodeInstruction(OpCodes.Pop);
+                    yield return new CodeInstruction(OpCodes.Pop);
+                    continue;
                 }
 
                 yield return instruction;

@@ -78,15 +78,23 @@ namespace TreeSnapping
                         if (height != 0 & height != ushort.MaxValue)
                         {
                             treeBuffer[i].m_posY = height;
+                            Logging.Message("tree ", i, " has m_posY of ", height);
                         }
                         else
                         {
                             // Clear the fixed height flag of any tree without valid snapping data.
-                            if (!treeBuffer[i].FixedHeight)
-                            {
-                                treeBuffer[i].FixedHeight = false;
-                            }
+                            treeBuffer[i].m_posY = 0;
+                            treeBuffer[i].FixedHeight = false;
                         }
+                    }
+                }
+
+                // Initialize remaining tree buffer with default m_posY, if necessary.
+                if (dataSize < bufferSize)
+                {
+                    for (int i = dataSize; i < bufferSize; ++i)
+                    {
+                        treeBuffer[i].m_posY = 0;
                     }
                 }
 

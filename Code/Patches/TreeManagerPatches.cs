@@ -60,12 +60,6 @@ namespace TreeControl.Patches
         [HarmonyPostfix]
         private static void CreateTreePostfix(TreeManager __instance, uint tree)
         {
-            // Set fixed height flag for tree.
-            if (tree != 0)
-            {
-                __instance.m_trees.m_buffer[tree].FixedHeight = true;
-            }
-
             // Record scale.
             TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;
         }
