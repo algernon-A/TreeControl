@@ -82,6 +82,12 @@ namespace TreeControl.Patches
         /// </summary>
         internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
 
+
+        /// <summary>
+        /// Gets a value indicating whether the 'hide on load' setting is currently enabled (i.e. only during loading).
+        /// </summary>
+        private static bool HideOnLoadActive => Loading.IsLoaded | s_hideOnLoad;
+
         /// <summary>
         /// Initializes the scaling buffer.
         /// MUST be invoked before referencing the buffer (which includes invokation of TreeInstance.PopulateGroupData on game data deserialization).
@@ -186,16 +192,16 @@ namespace TreeControl.Patches
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> CheckOverlapTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            FieldInfo anarchyState = AccessTools.Field(typeof(TreeInstancePatches), nameof(s_hideOnLoad));
+            MethodInfo hideOnLoad = AccessTools.PropertyGetter(typeof(TreeInstancePatches), nameof(HideOnLoadActive));
 
             // Looking for new stloc.s 11 (boolean flag used to signify overlaps).
             foreach (CodeInstruction instruction in instructions)
             {
                 if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 11)
                 {
-                    // Found it - append &= s_hideOnLoad to the boolean value to be stored).
+                    // Found it - append &= HideOnLoadActive to the boolean value to be stored).
                     Logging.Message("found stloc.s 11");
-                    yield return new CodeInstruction(OpCodes.Ldsfld, anarchyState);
+                    yield return new CodeInstruction(OpCodes.Call, hideOnLoad);
                     yield return new CodeInstruction(OpCodes.And);
                 }
 
