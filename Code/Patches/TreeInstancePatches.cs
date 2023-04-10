@@ -82,7 +82,6 @@ namespace TreeControl.Patches
         /// </summary>
         internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
 
-
         /// <summary>
         /// Gets a value indicating whether the 'hide on load' setting is currently enabled (i.e. only during loading).
         /// </summary>
@@ -124,7 +123,7 @@ namespace TreeControl.Patches
             int thisValue = value;
 
             // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
-            if (__instance.GrowState != 0 & value == 0 & s_anarchyEnabled)
+            if ((!Loading.IsLoaded | __instance.GrowState != 0) & value == 0 & s_anarchyEnabled)
             {
                 thisValue = 1;
             }
