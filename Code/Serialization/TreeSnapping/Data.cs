@@ -78,7 +78,6 @@ namespace TreeSnapping
                         if (height != 0 & height != ushort.MaxValue)
                         {
                             treeBuffer[i].m_posY = height;
-                            Logging.Message("tree ", i, " has m_posY of ", height);
                         }
                         else
                         {

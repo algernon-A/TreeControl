@@ -32,7 +32,7 @@ namespace TreeScaling
                 // Write each tree scale entry.
                 for (int i = 0; i < ScalingArray.Length; ++i)
                 {
-                    serializer.WriteFloat(ScalingArray[i]);
+                    serializer.WriteFloat(ScalingArray[i] * ScaleToFloat);
                 }
             }
             catch (Exception e)
@@ -80,7 +80,7 @@ namespace TreeScaling
                         }
                     }
 
-                    ScalingArray[i] = scale;
+                    ScalingArray[i] = (byte)(scale * FloatToScale);
                 }
             }
             catch (Exception e)

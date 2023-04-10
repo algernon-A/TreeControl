@@ -22,17 +22,14 @@ namespace TreeControl.Patches
     internal static class TreeToolPatches
     {
         /// <summary>
-        /// Default tree scaling factor.
-        /// </summary>
-        internal const float DefaultScale = 1.0f;
-
-        /// <summary>
         /// Default elevation adjustment factor.
         /// </summary>
         internal const float DefaultElevationAdjustment = 0f;
 
+        private const int MinScalingFactor = 5;
+
         // Tree scaling factor.
-        private static float s_scaling = DefaultScale;
+        private static byte s_scaling = TreeInstancePatches.DefaultScale;
 
         // Tree elevation adjustment.
         private static float s_elevationAdjustment = DefaultElevationAdjustment;
@@ -40,7 +37,7 @@ namespace TreeControl.Patches
         /// <summary>
         /// Gets or sets the current tree scaling factor.
         /// </summary>
-        internal static float Scaling
+        internal static byte Scaling
         {
             get => s_scaling;
 
@@ -50,7 +47,7 @@ namespace TreeControl.Patches
                 if (Singleton<ToolController>.instance.CurrentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
                 {
                     // Enforce minimum bound.
-                    s_scaling = Mathf.Max(0.01f, value);
+                    s_scaling = (byte)Mathf.Clamp(value, MinScalingFactor, byte.MaxValue);
                 }
             }
         }
@@ -73,6 +70,16 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
+        /// Increments the current scaling factor by the provided amount.
+        /// </summary>
+        /// <param name="increment">Amount to increment.</param>
+        internal static void IncrementScaling(float increment)
+        {
+            int newValue = s_scaling + Mathf.RoundToInt(increment);
+            s_scaling = (byte)Mathf.Clamp(newValue, MinScalingFactor, byte.MaxValue);
+        }
+
+        /// <summary>
         /// Harmony Transpiler for TreeTool.RenderGeometry to implement tree scaling.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
@@ -88,6 +95,9 @@ namespace TreeControl.Patches
                 {
                     // Multiply the calculated value by our scaling factor before storing.
                     yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeToolPatches), nameof(s_scaling)));
+                    yield return new CodeInstruction(OpCodes.Conv_R4);
+                    yield return new CodeInstruction(OpCodes.Ldc_R4, TreeInstancePatches.ScaleToFloat);
+                    yield return new CodeInstruction(OpCodes.Mul);
                     yield return new CodeInstruction(OpCodes.Mul);
                 }
 

@@ -40,7 +40,7 @@ namespace TreeControl.Patches
         /// </summary>
         internal static void Postfix()
         {
-            TreeToolPatches.Scaling = TreeToolPatches.DefaultScale;
+            TreeToolPatches.Scaling = TreeInstancePatches.DefaultScale;
             TreeToolPatches.ElevationAdjustment = TreeToolPatches.DefaultElevationAdjustment;
         }
     }

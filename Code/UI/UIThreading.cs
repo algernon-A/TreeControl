@@ -16,10 +16,10 @@ namespace TreeControl
     public sealed class UIThreading : ThreadingExtensionBase
     {
         // Scaling step - initial (on keydown).
-        private const float InitialScalingIncrement = 0.05f;
+        private const byte InitialScalingIncrement = 3;
 
         // Scaling step - repeating, per second.
-        private const float RepeatScalingIncrement = 0.5f;
+        private const float RepeatScalingIncrement = 60f;
 
         // Elevation step - initial (on keydown).
         private const float InitialElevationIncrement = 0.1f;
@@ -118,7 +118,7 @@ namespace TreeControl
                     _scaleUpKeyProcessed = true;
 
                     // Increment scaling.
-                    TreeToolPatches.Scaling += InitialScalingIncrement;
+                    TreeToolPatches.IncrementScaling(InitialScalingIncrement);
 
                     // Record keypress time.
                     _keyTimer = now + s_initialRepeatDelay;
@@ -128,7 +128,7 @@ namespace TreeControl
                     // Handle key repeat, if appropriate.
                     if (now > _keyTimer)
                     {
-                        TreeToolPatches.Scaling += RepeatScalingIncrement * Time.deltaTime;
+                        TreeToolPatches.IncrementScaling(RepeatScalingIncrement * Time.deltaTime);
                     }
                 }
             }
@@ -151,7 +151,7 @@ namespace TreeControl
                     _scaleDownKeyProcessed = true;
 
                     // Increment scaling.
-                    TreeToolPatches.Scaling -= InitialScalingIncrement;
+                    TreeToolPatches.IncrementScaling(-InitialScalingIncrement);
 
                     // Record keypress time.
                     _keyTimer = now + s_initialRepeatDelay;
@@ -161,7 +161,7 @@ namespace TreeControl
                     // Handle key repeat, if appropriate.
                     if (now > _keyTimer)
                     {
-                        TreeToolPatches.Scaling -= RepeatScalingIncrement * Time.deltaTime;
+                        TreeToolPatches.IncrementScaling(-RepeatScalingIncrement * Time.deltaTime);
                     }
                 }
             }

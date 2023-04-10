@@ -32,8 +32,23 @@ namespace TreeControl.Patches
         /// </summary>
         internal const float MaxSwayFactor = 1f;
 
+        /// <summary>
+        /// Default tree scaling factor.
+        /// </summary>
+        internal const byte DefaultScale = 50;
+
+        /// <summary>
+        /// Multiply scaling factor by this to get the rendered scale multiplier.
+        /// </summary>
+        internal const float ScaleToFloat = 1f / DefaultScale;
+
+        /// <summary>
+        /// Multiply rendered scale multiplier by this to get the scaling factor.
+        /// </summary>
+        internal const float FloatToScale = 1 / ScaleToFloat;
+
         // Tree scaling data.
-        private static float[] s_scalingData;
+        private static byte[] s_scalingData;
 
         // Anarchy flags.
         private static bool s_anarchyEnabled = false;
@@ -50,7 +65,7 @@ namespace TreeControl.Patches
         /// <summary>
         /// Gets the tree scaling data array.
         /// </summary>
-        internal static float[] ScalingArray => s_scalingData;
+        internal static byte[] ScalingArray => s_scalingData;
 
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
@@ -98,12 +113,12 @@ namespace TreeControl.Patches
             TreeManager treeManager = Singleton<TreeManager>.instance;
 
             Logging.Message("creating tree scaling data array of size ", size);
-            s_scalingData = new float[size];
+            s_scalingData = new byte[size];
 
             // Default initial scale is 1.
             for (int i = 0; i < size; ++i)
             {
-                s_scalingData[i] = 1.0f;
+                s_scalingData[i] = DefaultScale;
 
                 // Update tree after reading scaling data.
                 treeManager.UpdateTree((uint)i);
@@ -253,7 +268,10 @@ namespace TreeControl.Patches
                     // Multiply the calculated value by our scaling factor before storing.
                     yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_scalingData)));
                     yield return new CodeInstruction(OpCodes.Ldarg_1);
-                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(float));
+                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(byte));
+                    yield return new CodeInstruction(OpCodes.Conv_R4);
+                    yield return new CodeInstruction(OpCodes.Ldc_R4, ScaleToFloat);
+                    yield return new CodeInstruction(OpCodes.Mul);
                     yield return new CodeInstruction(OpCodes.Mul);
                 }
 
@@ -341,7 +359,10 @@ namespace TreeControl.Patches
                     // Multiply the calculated value by our scaling factor before storing.
                     yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_scalingData)));
                     yield return new CodeInstruction(OpCodes.Ldarg_2);
-                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(float));
+                    yield return new CodeInstruction(OpCodes.Ldelem, typeof(byte));
+                    yield return new CodeInstruction(OpCodes.Conv_R4);
+                    yield return new CodeInstruction(OpCodes.Ldc_R4, ScaleToFloat);
+                    yield return new CodeInstruction(OpCodes.Mul);
                     yield return new CodeInstruction(OpCodes.Mul);
                 }
 
