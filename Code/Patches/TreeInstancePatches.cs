@@ -123,8 +123,8 @@ namespace TreeControl.Patches
         {
             int thisValue = value;
 
-            // Always override value of 0 (tree hidden) when anarchy is enabled.
-            if (value == 0 && s_anarchyEnabled)
+            // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
+            if (__instance.GrowState != 0 & value == 0 & s_anarchyEnabled)
             {
                 thisValue = 1;
             }
