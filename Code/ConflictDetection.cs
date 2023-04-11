@@ -5,6 +5,7 @@
 
 namespace TreeControl
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using AlgernonCommons;
@@ -91,6 +92,83 @@ namespace TreeControl
                             {
                                 conflictDetected = true;
                                 conflictingModNames.Add("Tree Anarchy");
+                            }
+
+                            break;
+
+                        case "TreeUnlimiter":
+                            // Unlimited Trees. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Unlimited Trees");
+                            }
+
+                            break;
+
+                        case "PropAnarchy":
+                            // Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+
+                                // But which one?
+                                if (assembly.GetName().Version == new Version("1.0.0.0"))
+                                {
+                                    // Prop & Tree Anarchy (original BP).
+                                    conflictingModNames.Add("Prop & Tree Anarchy");
+                                }
+                            }
+
+                            break;
+
+                        case "TreeLodFix":
+                            // Tree LOD fix. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Tree LOD Fix");
+                            }
+
+                            break;
+
+                        case "RandomTreeRotation":
+                        case "RandomTreeRotation_ND":
+                            // Random Tree Rotation. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Random Tree Rotation");
+                            }
+
+                            break;
+
+                        case "TreeSnapping":
+                            // Tree LOD fix. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Tree Snapping");
+                            }
+
+                            break;
+
+                        case "LockForestry":
+                            // Lock Forestry. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Lock Forestry");
+                            }
+
+                            break;
+
+                        case "TreeMovementControl":
+                            // Tree Movement Control. Okay to just be disabled.
+                            if (plugin.isEnabled)
+                            {
+                                conflictDetected = true;
+                                conflictingModNames.Add("Tree Movement Control");
                             }
 
                             break;
