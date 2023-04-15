@@ -1,3 +1,3 @@
-Version 0.9.1s -
+Version 0.9.1 -
 
 - Adjust overlap detection handling
