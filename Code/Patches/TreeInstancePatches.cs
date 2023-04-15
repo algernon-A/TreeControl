@@ -9,6 +9,7 @@ namespace TreeControl.Patches
     using System.Collections.Generic;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
     using AlgernonCommons;
     using ColossalFramework;
     using HarmonyLib;
@@ -138,9 +139,15 @@ namespace TreeControl.Patches
             int thisValue = value;
 
             // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
-            if ((!Loading.IsLoaded | __instance.GrowState != 0) & value == 0 & s_anarchyEnabled)
+            if ((!s_terrainReady | __instance.GrowState != 0) & value == 0 & s_anarchyEnabled)
             {
                 thisValue = 1;
+            }
+
+            // Enforce 'hide on load' function.
+            if (!s_terrainReady & s_hideOnLoad)
+            {
+                thisValue = value;
             }
 
             __instance.m_flags = (ushort)((int)(__instance.m_flags & 0xFFFFF0FFu) | Mathf.Clamp(thisValue, 0, 15) << 8);
@@ -179,10 +186,11 @@ namespace TreeControl.Patches
         /// Harmony pre-emptive prefix to TreeInstance.CalculateTree to implement tree snapping.
         /// </summary>
         /// <param name="__instance">TreeInstance instance.</param>
+        /// <param name="treeID">Tree ID.</param>
         /// <returns>Always false (never execute original method).</returns>
         [HarmonyPatch(nameof(TreeInstance.CalculateTree))]
         [HarmonyPrefix]
-        private static bool CalculateTreePrefix(ref TreeInstance __instance)
+        private static bool CalculateTreePrefix(ref TreeInstance __instance, uint treeID)
         {
             // Only do this for created trees with no recorded Y position
             if (((__instance.m_flags & (ushort)TreeInstance.Flags.Created) == 1) & __instance.m_posY == 0)
@@ -193,8 +201,27 @@ namespace TreeControl.Patches
                 __instance.m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
             }
 
+            // Check overlap if game has loaded and anarchy isn't enabled.
+            if (!s_anarchyEnabled & s_terrainReady)
+            {
+                CheckOverlap(ref __instance, treeID);
+            }
+
             // Don't execute original method.
             return false;
+        }
+
+        /// <summary>
+        /// Harmony reverse patch for TreeInstance.CheckOverlap to access original (un-transpiled) game method.
+        /// </summary>
+        /// <param name="__instance">TreeInstance instance.</param>
+        /// <param name="treeID">Tree ID.</param>
+        [HarmonyPatch("CheckOverlap")]
+        [HarmonyReversePatch(HarmonyReversePatchType.Original)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void CheckOverlap(ref TreeInstance __instance, uint treeID)
+        {
+            Logging.Error("CheckOverlap reverse patch wasn't applied! args", __instance, treeID);
         }
 
         /// <summary>

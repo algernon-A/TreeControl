@@ -16,7 +16,6 @@ namespace TreeControl.Patches
     /// Harmony patches to implement tree snapping.
     /// </summary>
     [HarmonyPatch(typeof(TreeManager))]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     internal static class TreeManagerPatches
     {
         /// <summary>
@@ -54,11 +53,10 @@ namespace TreeControl.Patches
         /// <summary>
         /// Harmony postfix to TreeManager.CreateTree to implement tree snapping.
         /// </summary>>
-        /// <param name="__instance">TreeManager instance.</param>
         /// <param name="tree">ID of newly-created tree.</param>
         [HarmonyPatch(nameof(TreeManager.CreateTree))]
         [HarmonyPostfix]
-        private static void CreateTreePostfix(TreeManager __instance, uint tree)
+        private static void CreateTreePostfix(uint tree)
         {
             // Record scale.
             TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;
