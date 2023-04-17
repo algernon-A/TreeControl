@@ -13,8 +13,8 @@ namespace TreeControl.ExpandedData
     using static TreeManager;
 
     /// <summary>
-    /// Savegame data container for expanded district data.
-    /// Mirroring the original 81 tiles to make backwards-compatibility easier and because no particular reason to change.
+    /// Savegame data container for expanded tree limit data.
+    /// Uses vanilla tree data format.
     /// </summary>
     public sealed class TreeDataContainer : IDataContainer
     {
@@ -109,7 +109,7 @@ namespace TreeControl.ExpandedData
         }
 
         /// <summary>
-        /// Reads expanded tree from savegame.
+        /// Reads expanded tree data from savegame.
         /// Uses vanilla tree format.
         /// </summary>
         /// <param name="serializer">Data serializer.</param>

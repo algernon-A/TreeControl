@@ -1,3 +1,6 @@
+- Automatically read and convert Tree Anarchy data
+
+
 Version 0.9.1 -
 
 - Adjust overlap detection handling

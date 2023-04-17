@@ -5,9 +5,7 @@
 
 namespace TreeSnapping
 {
-    using System;
     using System.IO;
-    using System.Linq;
     using ColossalFramework.IO;
     using ICities;
 

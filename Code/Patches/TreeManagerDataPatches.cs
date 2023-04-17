@@ -5,6 +5,7 @@
 
 namespace TreeControl.Patches
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
@@ -13,6 +14,7 @@ namespace TreeControl.Patches
     using ColossalFramework;
     using ColossalFramework.IO;
     using HarmonyLib;
+    using TreeAnarchy;
     using TreeControl.ExpandedData;
     using UnityEngine;
     using static TreeManager;
@@ -205,11 +207,12 @@ namespace TreeControl.Patches
             // Replacement tree array.
             Array32<TreeInstance> newTreeArray = null;
 
-            // Local reference.
+            // Local references.
+            SimulationManager simulationManager = Singleton<SimulationManager>.instance;
             TreeInstance[] oldBuffer = instance.m_trees.m_buffer;
 
             // See if this save contains any extended treedata data.
-            if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(TreeDataSerializer.DataID, out byte[] data))
+            if (simulationManager.m_serializableDataStorage.TryGetValue(TreeDataSerializer.DataID, out byte[] data))
             {
                 // Yes - load it.
                 using (MemoryStream stream = new MemoryStream(data))
@@ -223,6 +226,26 @@ namespace TreeControl.Patches
                 if (dataReadSize > MAX_TREE_COUNT)
                 {
                     newTreeArray = TreeDataContainer.ExpandedData;
+                }
+            }
+
+            // Otherwise, check for Tree Anarchy data.
+            else if (simulationManager.m_serializableDataStorage.TryGetValue("TreeAnarchy", out data) && data != null)
+            {
+                // Found Tree Anarchy data - load it.
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    Logging.KeyMessage("found Tree Anarchy data");
+                    DataSerializer.Deserialize<TreeAnarchyData>(stream, DataSerializer.Mode.Memory, TreeAnarchyData.TALegacyTypeConverter);
+                }
+
+                // Check results.
+                int dataReadSize = TreeAnarchyData.ExpandedData?.m_buffer.Length ?? 0;
+                if (dataReadSize > MAX_TREE_COUNT)
+                {
+                    // Expanded Tree Anarchy data was read; this includes snapping and scaling data.
+                    // All conversion is done via the deserialization, so nothing more to do here.
+                    return TreeAnarchyData.ExpandedData.m_buffer;
                 }
             }
 
@@ -281,6 +304,9 @@ namespace TreeControl.Patches
             return newTreeArray.m_buffer;
         }
 
+        /// <summary>
+        /// Deserializes tree scaling data.
+        /// </summary>
         private static void DeserializeScaling()
         {
             if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(TreeScaling.SerializableData.DataID, out byte[] data))
@@ -294,6 +320,9 @@ namespace TreeControl.Patches
             }
         }
 
+        /// <summary>
+        /// Deserializes tree snapping data.
+        /// </summary>
         private static void DeserializeSnapping()
         {
             if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(TreeSnapping.SerializableData.DataID, out byte[] data))

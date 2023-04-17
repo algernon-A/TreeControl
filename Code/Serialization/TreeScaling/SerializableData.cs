@@ -6,7 +6,6 @@
 namespace TreeScaling
 {
     using System.IO;
-    using System.Linq;
     using ColossalFramework.IO;
     using ICities;
 
