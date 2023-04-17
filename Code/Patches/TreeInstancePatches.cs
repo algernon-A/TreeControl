@@ -193,7 +193,14 @@ namespace TreeControl.Patches
         private static bool CalculateTreePrefix(ref TreeInstance __instance, uint treeID)
         {
             // Only do this for created trees with no recorded Y position
-            if (((__instance.m_flags & (ushort)TreeInstance.Flags.Created) == 1) & __instance.m_posY == 0)
+            if ((__instance.m_flags & (ushort)TreeInstance.Flags.Created) == 0)
+            {
+                // Don't execute original method.
+                return false;
+            }
+
+            // Fix trees with no recorded Y position.
+            if (__instance.m_posY == 0)
             {
                 // Move tree to terrain height.
                 Vector3 position = __instance.Position;
@@ -201,7 +208,7 @@ namespace TreeControl.Patches
                 __instance.m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
             }
 
-            // Check overlap if game has loaded and anarchy isn't enabled.
+            // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
             if ((!s_anarchyEnabled & s_terrainReady) | (!s_terrainReady & s_hideOnLoad))
             {
                 CheckOverlap(ref __instance, treeID);

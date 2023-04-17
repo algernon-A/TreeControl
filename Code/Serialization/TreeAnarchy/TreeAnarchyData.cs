@@ -17,7 +17,15 @@ namespace TreeAnarchy
     /// </summary>
     public class TreeAnarchyData : IDataContainer
     {
-        private const ushort FireDamageBurningMask = unchecked((ushort)~(TreeInstance.Flags.Burning | TreeInstance.Flags.FireDamage));
+        /// <summary>
+        /// Tree Anarchy data key.
+        /// </summary>
+        public const string DataID = "TreeAnarchy";
+
+        /// <summary>
+        /// Tree flag mask for burning and fire damage.
+        /// </summary>
+        public const ushort FireDamageBurningMask = unchecked((ushort)~(TreeInstance.Flags.Burning | TreeInstance.Flags.FireDamage));
 
         /// <summary>
         /// Tree anarchy data versions.
@@ -178,6 +186,7 @@ namespace TreeAnarchy
 
                         // TreeInfos aren't available at this stage of loading, so we can't determine the exact scale midpoint.
                         // Instead, we'll go out on a limb (boom, tish....) and assume that scales are based around 1.0.
+                        // This has proven to be correct (enough) for all specifically tested prefabs so far.
                         TreeInstancePatches.ScalingArray[i] = (byte)((extraScale + 1f) * TreeInstancePatches.FloatToScale);
                     }
                 }

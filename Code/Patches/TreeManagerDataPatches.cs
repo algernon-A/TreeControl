@@ -17,6 +17,7 @@ namespace TreeControl.Patches
     using TreeAnarchy;
     using TreeControl.ExpandedData;
     using UnityEngine;
+    using UnlimitedTrees;
     using static TreeManager;
     using TreeInstance = global::TreeInstance;
 
@@ -230,7 +231,7 @@ namespace TreeControl.Patches
             }
 
             // Otherwise, check for Tree Anarchy data.
-            else if (simulationManager.m_serializableDataStorage.TryGetValue("TreeAnarchy", out data) && data != null)
+            else if (simulationManager.m_serializableDataStorage.TryGetValue(TreeAnarchyData.DataID, out data) && data != null)
             {
                 // Found Tree Anarchy data - load it.
                 using (MemoryStream stream = new MemoryStream(data))
@@ -246,6 +247,34 @@ namespace TreeControl.Patches
                     // Expanded Tree Anarchy data was read; this includes snapping and scaling data.
                     // All conversion is done via the deserialization, so nothing more to do here.
                     return TreeAnarchyData.ExpandedData.m_buffer;
+                }
+            }
+
+            // Otherwise, check for Unlimited Trees data.
+            else if (simulationManager.m_serializableDataStorage.ContainsKey(UnlimitedTreesData.DataID))
+            {
+                // Get data directly - this is bizarre serialized and fragile stuff.
+                data = simulationManager.m_serializableDataStorage[UnlimitedTreesData.DataID];
+
+                Logging.KeyMessage("found Unlimited Trees data");
+                if (data == null || data.Length < 2 || data.Length % 2 != 0)
+                {
+                    Logging.Error("Unlimited Trees data was invalid; ignoring");
+                }
+                else
+                {
+                    UnlimitedTreesData deserializer = new UnlimitedTreesData();
+                    newTreeArray = deserializer.Deserialize(data);
+
+                    if (newTreeArray != null)
+                    {
+                        // Clear burning tree buffer.
+                        Singleton<TreeManager>.instance.m_burningTrees.Clear();
+                    }
+                    else
+                    {
+                        Logging.Error("Unlimited Trees data was invalid; ignoring");
+                    }
                 }
             }
 
