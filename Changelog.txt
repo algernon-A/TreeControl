@@ -1,3 +1,5 @@
+Verson 0.9.2 -
+
 - Automatically read and convert Tree Anarchy data
 - Revise overlap detection handling
 - Update AlgernonCommons
