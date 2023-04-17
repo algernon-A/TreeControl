@@ -139,7 +139,7 @@ namespace TreeControl.Patches
             int thisValue = value;
 
             // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
-            if ((!s_terrainReady | __instance.GrowState != 0) & value == 0 & s_anarchyEnabled)
+            if (value == 0 & s_anarchyEnabled)
             {
                 thisValue = 1;
             }
@@ -202,7 +202,7 @@ namespace TreeControl.Patches
             }
 
             // Check overlap if game has loaded and anarchy isn't enabled.
-            if (!s_anarchyEnabled & s_terrainReady)
+            if ((!s_anarchyEnabled & s_terrainReady) | (!s_terrainReady & s_hideOnLoad))
             {
                 CheckOverlap(ref __instance, treeID);
             }
@@ -222,32 +222,6 @@ namespace TreeControl.Patches
         private static void CheckOverlap(ref TreeInstance __instance, uint treeID)
         {
             Logging.Error("CheckOverlap reverse patch wasn't applied! args", __instance, treeID);
-        }
-
-        /// <summary>
-        /// Harmony transpiler for TreeInstance.CheckOverlap to implement tree anarchy.
-        /// </summary>
-        /// <param name="instructions">Original ILCode.</param>
-        /// <returns>Modified ILCode.</returns>
-        [HarmonyPatch("CheckOverlap")]
-        [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> CheckOverlapTranspiler(IEnumerable<CodeInstruction> instructions)
-        {
-            MethodInfo hideOnLoad = AccessTools.PropertyGetter(typeof(TreeInstancePatches), nameof(HideOnLoadActive));
-
-            // Looking for new stloc.s 11 (boolean flag used to signify overlaps).
-            foreach (CodeInstruction instruction in instructions)
-            {
-                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == 11)
-                {
-                    // Found it - append &= HideOnLoadActive to the boolean value to be stored).
-                    Logging.Message("found stloc.s 11");
-                    yield return new CodeInstruction(OpCodes.Call, hideOnLoad);
-                    yield return new CodeInstruction(OpCodes.And);
-                }
-
-                yield return instruction;
-            }
         }
 
         /// <summary>
