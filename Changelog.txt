@@ -1,3 +1,5 @@
+Version 0.9.3 -
+
 - Add option to ignore Tree Anarchy mod data
 - Automatically read and convert Unlimited Trees mod data
 - Streamline post-load RenderGroup refresh process
