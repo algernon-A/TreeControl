@@ -41,6 +41,11 @@ namespace TreeControl.Patches
         private static int s_customTreeLimit = MAX_TREE_COUNT;
 
         /// <summary>
+        /// Gets or sets a value indicating whether any Tree Anarchy mod data should be ignored.
+        /// </summary>
+        internal static bool IgnoreTreeAnarchyData { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the currently active default custom tree limit.
         /// </summary>
         internal static int CustomTreeLimit
@@ -231,7 +236,7 @@ namespace TreeControl.Patches
             }
 
             // Otherwise, check for Tree Anarchy data.
-            else if (simulationManager.m_serializableDataStorage.TryGetValue(TreeAnarchyData.DataID, out data) && data != null)
+            else if (!IgnoreTreeAnarchyData && simulationManager.m_serializableDataStorage.TryGetValue(TreeAnarchyData.DataID, out data) && data != null)
             {
                 // Found Tree Anarchy data - load it.
                 using (MemoryStream stream = new MemoryStream(data))

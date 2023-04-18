@@ -65,6 +65,12 @@ namespace TreeControl
         public bool LockForestry { get => NaturalResourceManagerPatches.LockForestry; set => NaturalResourceManagerPatches.LockForestry = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether any Tree Anarchy mod data should be ignored.
+        /// </summary>
+        [XmlElement("IgnoreTreeAnarchyData")]
+        public bool IgnoreTreeAnarchyData { get => TreeManagerDataPatches.IgnoreTreeAnarchyData; set => TreeManagerDataPatches.IgnoreTreeAnarchyData = value; }
+
+        /// <summary>
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
         [XmlElement("AnarchyKey")]

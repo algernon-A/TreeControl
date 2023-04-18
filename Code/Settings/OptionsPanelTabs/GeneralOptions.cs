@@ -46,12 +46,6 @@ namespace TreeControl
             languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += languageDropDown.parent.height + Margin;
 
-            // Logging checkbox.
-            UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
-            loggingCheck.isChecked = Logging.DetailLogging;
-            loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
-            currentY += GroupMargin;
-
             // Hide on load check.
             UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
             hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
@@ -94,6 +88,26 @@ namespace TreeControl
             lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_TIP");
             lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestry;
             lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestry = isChecked; };
+            currentY += lockForestryCheck.height + GroupMargin;
+
+            // Troubleshooting options.
+            float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
+            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("TROUBLESHOOTING"));
+            currentY += TitleMargin;
+
+            // Ignore Tree Anarchy data.
+            UICheckBox ignoreTreeAnarchyCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("IGNORE_TA_DATA"));
+            ignoreTreeAnarchyCheck.tooltip = Translations.Translate("IGNORE_TA_DATA_TIP");
+            ignoreTreeAnarchyCheck.isChecked = TreeManagerDataPatches.IgnoreTreeAnarchyData;
+            ignoreTreeAnarchyCheck.eventCheckChanged += (c, isChecked) => { TreeManagerDataPatches.IgnoreTreeAnarchyData = isChecked; };
+            currentY += GroupMargin;
+            ignoreTreeAnarchyCheck.tooltipBox = UIToolTips.WordWrapToolTip;
+
+
+            // Logging checkbox.
+            UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
+            loggingCheck.isChecked = Logging.DetailLogging;
+            loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
         }
     }
 }

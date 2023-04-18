@@ -197,6 +197,8 @@ namespace TreeAnarchy
             // Burning trees.
             if ((Format)serializer.version >= Format.Version7)
             {
+                Logging.KeyMessage("found Tree Anarchy burning trees");
+
                 FastList<BurningTree> burningTrees = treeManager.m_burningTrees;
                 burningTrees.Clear();
 
