@@ -7,10 +7,9 @@ namespace TreeControl
 {
     using System.Collections.Generic;
     using AlgernonCommons.Patching;
+    using ColossalFramework;
     using ICities;
     using TreeControl.Patches;
-
-    using UnityEngine;
 
     /// <summary>
     /// Main loading class: the mod runs from here.
@@ -36,8 +35,9 @@ namespace TreeControl
             // Assign tree LOD resolution.
             TreeLODControl.SetLODResolution();
 
-            // Record terrain as being ready (enable snapping terrain features).
-            TreeInstancePatches.TerrainReady = true;
+            // Update all tree render groups.
+            Singleton<SimulationManager>.instance.AddAction(() => TreeInstancePatches.UpdateTrees());
+            TreeInstancePatches.UpdateRenderGroups();
         }
     }
 }

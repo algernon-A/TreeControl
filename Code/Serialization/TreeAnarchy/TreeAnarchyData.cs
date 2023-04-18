@@ -203,27 +203,24 @@ namespace TreeAnarchy
                 // Read burning tree size.
                 int burningTreesSize = (int)serializer.ReadUInt24();
 
-                if (burningTreesSize > 0)
+                burningTrees.EnsureCapacity(burningTreesSize);
+                BurningTree burningTree = default;
+
+                for (int i = 0; i < burningTreesSize; ++i)
                 {
-                    burningTrees.EnsureCapacity(burningTreesSize);
-                    BurningTree burningTree = default;
+                    burningTree.m_treeIndex = serializer.ReadUInt24();
+                    burningTree.m_fireIntensity = (byte)serializer.ReadUInt8();
+                    burningTree.m_fireDamage = (byte)serializer.ReadUInt8();
 
-                    for (int i = 0; i < burningTreesSize; ++i)
+                    // Initialize burning tree, ensuring that the treeIndex is valid.
+                    uint treeIndex = burningTree.m_treeIndex;
+                    if (treeIndex > 0 && treeIndex < savedBufferSize)
                     {
-                        burningTree.m_treeIndex = serializer.ReadUInt24();
-                        burningTree.m_fireIntensity = (byte)serializer.ReadUInt8();
-                        burningTree.m_fireDamage = (byte)serializer.ReadUInt8();
-
-                        // Initialize burning tree, ensuring that the treeIndex is valid.
-                        uint treeIndex = burningTree.m_treeIndex;
-                        if (treeIndex > 0 && treeIndex < savedBufferSize)
+                        burningTrees.Add(burningTree);
+                        newTreeBuffer[treeIndex].m_flags |= 64;
+                        if (burningTree.m_fireIntensity != 0)
                         {
-                            burningTrees.Add(burningTree);
-                            newTreeBuffer[treeIndex].m_flags |= 64;
-                            if (burningTree.m_fireIntensity != 0)
-                            {
-                                newTreeBuffer[treeIndex].m_flags |= 128;
-                            }
+                            newTreeBuffer[treeIndex].m_flags |= 128;
                         }
                     }
                 }

@@ -110,9 +110,6 @@ namespace TreeControl.Patches
         /// <param name="size">Buffer size to create.</param>
         internal static void InitializeScalingBuffer(int size)
         {
-            // Local reference.
-            TreeManager treeManager = Singleton<TreeManager>.instance;
-
             Logging.Message("creating tree scaling data array of size ", size);
             s_scalingData = new byte[size];
 
@@ -120,9 +117,62 @@ namespace TreeControl.Patches
             for (int i = 0; i < size; ++i)
             {
                 s_scalingData[i] = DefaultScale;
+            }
+        }
 
-                // Update tree after reading scaling data.
-                treeManager.UpdateTree((uint)i);
+        /// <summary>
+        /// Updates all tree states, correcting tree hights and applying overlaps per the 'Hide on load' setting.
+        /// Should generally only be called once just after level loading.
+        /// </summary>
+        internal static void UpdateTrees()
+        {
+            TreeManager treeManager = Singleton<TreeManager>.instance;
+            TreeInstance[] trees = treeManager.m_trees.m_buffer;
+
+            for (int i = 0; i < trees.Length; ++i)
+            {
+                // Only do this for created trees with no recorded Y position
+                if ((trees[i].m_flags & (ushort)TreeInstance.Flags.Created) == 0)
+                {
+                    continue;
+                }
+
+                // Fix trees with no recorded Y position.
+                if (trees[i].m_posY == 0)
+                {
+                    // Move tree to terrain height.
+                    Vector3 position = trees[i].Position;
+                    position.y = Singleton<TerrainManager>.instance.SampleDetailHeight(position);
+                    trees[i].m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
+                }
+
+                // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
+                if (s_hideOnLoad)
+                {
+                    CheckOverlap(ref trees[i], (uint)i);
+                }
+            }
+
+            // Set 'Terrain ready' flag now that initial setup has been performed.
+            s_terrainReady = true;
+        }
+
+        /// <summary>
+        /// Update all <see cref="RenderGroup"/> for the tree layer.
+        /// </summary>
+        internal static void UpdateRenderGroups()
+        {
+            // Local references.
+            RenderManager renderManager = Singleton<RenderManager>.instance;
+            int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
+
+            // 45x45 grid.
+            for (int x = 0; x < 45; ++x)
+            {
+                for (int z = 0; z < 45; ++z)
+                {
+                    renderManager.UpdateGroup(x, z, treeLayer);
+                }
             }
         }
 
