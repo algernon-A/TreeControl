@@ -7,7 +7,6 @@ namespace TreeControl
 {
     using System.Collections.Generic;
     using AlgernonCommons.Patching;
-    using ColossalFramework;
     using ICities;
     using TreeControl.Patches;
 
@@ -35,9 +34,8 @@ namespace TreeControl
             // Assign tree LOD resolution.
             TreeLODControl.SetLODResolution();
 
-            // Update all tree render groups.
-            Singleton<SimulationManager>.instance.AddAction(() => TreeInstancePatches.UpdateTrees());
-            TreeInstancePatches.UpdateRenderGroups();
+            // Peform end-of-load actions.
+            TreeInstancePatches.FinishLoading();
         }
     }
 }

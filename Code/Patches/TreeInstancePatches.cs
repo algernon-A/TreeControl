@@ -79,11 +79,6 @@ namespace TreeControl.Patches
         internal static bool HideOnLoad { get => s_hideOnLoad; set => s_hideOnLoad = value; }
 
         /// <summary>
-        /// Sets a value indicating whether the terrain has been initialized on load.
-        /// </summary>
-        internal static bool TerrainReady { set => s_terrainReady = value; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.
         /// </summary>
         internal static bool UpdateOnTerrain { get => s_updateOnTerrain; set => s_updateOnTerrain = value; }
@@ -121,12 +116,60 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Updates all tree states, correcting tree hights and applying overlaps per the 'Hide on load' setting.
-        /// Should generally only be called once just after level loading.
+        /// Update all <see cref="RenderGroup"/> for the tree layer.
         /// </summary>
-        internal static void UpdateTrees()
+        internal static void UpdateRenderGroups()
         {
-            TreeManager treeManager = Singleton<TreeManager>.instance;
+            // Local references.
+            RenderManager renderManager = Singleton<RenderManager>.instance;
+            int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
+
+            // 45x45 grid.
+            for (int x = 0; x < 45; ++x)
+            {
+                for (int z = 0; z < 45; ++z)
+                {
+                    renderManager.UpdateGroup(x, z, treeLayer);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs cleanup and update actions at the end of loading.
+        /// </summary>
+        internal static void FinishLoading()
+        {
+            // Via simulation thread.
+            Singleton<SimulationManager>.instance.AddAction(() =>
+            {
+                // Update last three RenderGroup rows (these thend to not be properly refreshed by the game during load if extended tree buffers are in use).
+                RenderManager renderManager = Singleton<RenderManager>.instance;
+                int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
+
+                // 45x45 grid.
+                for (int x = 0; x < 45; ++x)
+                {
+                    // Last three rows.
+                    for (int z = 0; z < 3; ++z)
+                    {
+                        // This ensures that RenderGroups are created and initialized for all grid squares.
+                        // The game doesn't actually always do this for the tree layer.
+                        renderManager.UpdateGroup(x, z, treeLayer);
+                    }
+                }
+
+                // Set terrain ready flag; loading is complete.
+                s_terrainReady = true;
+            });
+        }
+
+        /// <summary>
+        /// Updates all tree states, correcting tree hights and applying overlaps per the 'Hide on load' setting.
+        /// Should generally only be called once at loading.
+        /// </summary>
+        /// <param name="treeManager">TreeManager instance.</param>
+        internal static void UpdateTrees(TreeManager treeManager)
+        {
             TreeInstance[] trees = treeManager.m_trees.m_buffer;
 
             for (int i = 0; i < trees.Length; ++i)
@@ -150,28 +193,6 @@ namespace TreeControl.Patches
                 if (s_hideOnLoad)
                 {
                     CheckOverlap(ref trees[i], (uint)i);
-                }
-            }
-
-            // Set 'Terrain ready' flag now that initial setup has been performed.
-            s_terrainReady = true;
-        }
-
-        /// <summary>
-        /// Update all <see cref="RenderGroup"/> for the tree layer.
-        /// </summary>
-        internal static void UpdateRenderGroups()
-        {
-            // Local references.
-            RenderManager renderManager = Singleton<RenderManager>.instance;
-            int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
-
-            // 45x45 grid.
-            for (int x = 0; x < 45; ++x)
-            {
-                for (int z = 0; z < 45; ++z)
-                {
-                    renderManager.UpdateGroup(x, z, treeLayer);
                 }
             }
         }

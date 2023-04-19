@@ -103,7 +103,6 @@ namespace TreeControl
             currentY += GroupMargin;
             ignoreTreeAnarchyCheck.tooltipBox = UIToolTips.WordWrapToolTip;
 
-
             // Logging checkbox.
             UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
             loggingCheck.isChecked = Logging.DetailLogging;
