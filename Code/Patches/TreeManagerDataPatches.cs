@@ -365,7 +365,7 @@ namespace TreeControl.Patches
                 using (MemoryStream stream = new MemoryStream(data))
                 {
                     Logging.Message("found snapping data");
-                    DataSerializer.Deserialize<TreeSnapping.Data>(stream, DataSerializer.Mode.Memory);
+                    DataSerializer.Deserialize<TreeSnapping.Data>(stream, DataSerializer.Mode.Memory, TreeSnapping.Data.LegacyTypeConverter);
                 }
             }
         }

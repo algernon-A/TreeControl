@@ -18,6 +18,18 @@ namespace TreeSnapping
     public sealed class Data : IDataContainer
     {
         /// <summary>
+        /// Legacy container type converter.
+        /// </summary>
+        /// <param name="legacyTypeName">Legacy type name (ignored).</param>
+        /// <returns>Data type.</returns>
+        public static Type LegacyTypeConverter(string legacyTypeName)
+        {
+            Logging.Message("converting Tree Anarchy data type ", legacyTypeName);
+
+            return typeof(Data);
+        }
+
+        /// <summary>
         /// Saves tree snapping data (tree heights) to savegame.
         /// </summary>
         /// <param name="serializer">DataSerializer instance.</param>
