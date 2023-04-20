@@ -11,6 +11,7 @@ namespace TreeControl.Patches
     using AlgernonCommons;
     using ColossalFramework;
     using HarmonyLib;
+    using TreeControl.MoveItSupport;
     using UnityEngine;
     using static ToolBase;
 

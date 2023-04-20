@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
 
-namespace TreeControl.Patches
+namespace TreeControl.MoveItSupport
 {
     using System;
     using System.Collections.Generic;
@@ -14,6 +14,7 @@ namespace TreeControl.Patches
     using ColossalFramework;
     using HarmonyLib;
     using MoveIt;
+    using TreeControl.Patches;
     using UnityEngine;
 
     /// <summary>

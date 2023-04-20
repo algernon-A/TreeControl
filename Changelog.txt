@@ -1,4 +1,4 @@
-- Implement snapping and scaling of trees selected with Move It
+- Add Move It integration
 
 
 Version 0.9.4 -
