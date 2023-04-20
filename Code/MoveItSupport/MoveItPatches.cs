@@ -34,7 +34,7 @@ namespace TreeControl.MoveItSupport
         internal MoveItPatches(Assembly moveIt)
         {
             // Reflect Move It tool.
-            Type moveItToolType = moveIt.GetType("MoveIt.MoveItTool,MoveIt");
+            Type moveItToolType = moveIt.GetType("MoveIt.MoveItTool");
             if (moveItToolType == null)
             {
                 Logging.KeyMessage("Move It tool type not found");
@@ -55,7 +55,7 @@ namespace TreeControl.MoveItSupport
             }
 
             // Get Move It MoveableTree type.
-            _moveableTreeType = Type.GetType("MoveIt.MoveableTree,MoveIt");
+            _moveableTreeType = moveIt.GetType("MoveIt.MoveableTree");
             if (_moveableTreeType == null)
             {
                 Logging.Error("unable to reflect MoveIt.MoveableTree");

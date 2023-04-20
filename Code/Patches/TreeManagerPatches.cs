@@ -125,7 +125,6 @@ namespace TreeControl.Patches
         {
             // Record scale.
             TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;
-            Logging.KeyMessage("saving scaling amount of ", TreeToolPatches.Scaling);
         }
     }
 }
