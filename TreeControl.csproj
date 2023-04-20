@@ -9,9 +9,11 @@
 		<Product>$(Title)</Product>
 		<Version>0.9.4</Version>
 		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
+		<MoveItPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/1619685021</MoveItPath>
 		<AssemblySearchPaths>
 			$(AssemblySearchPaths);
-			$(ManagedDLLPath)
+			$(ManagedDLLPath);
+			$(MoveItPath)
 		</AssemblySearchPaths>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -28,6 +30,7 @@
 		<Reference Include="ColossalManaged" />
 		<Reference Include="ICities" />
 		<Reference Include="UnityEngine" />
+		<Reference Include="MoveIt" />
 	</ItemGroup>
 	<ItemGroup>
 		<_Translations Include="$(ProjectDir)/Translations/*.csv" />

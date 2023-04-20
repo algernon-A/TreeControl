@@ -36,6 +36,9 @@ namespace TreeControl
 
             // Peform end-of-load actions.
             TreeInstancePatches.FinishLoading();
+
+            // Patch Move It.
+            TreeToolPatches.CheckMoveIt();
         }
     }
 }

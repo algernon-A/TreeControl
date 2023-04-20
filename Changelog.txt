@@ -1,3 +1,6 @@
+- Implement snapping and scaling of trees selected with Move It
+
+
 Version 0.9.4 -
 
 - Move RenderGroup refresh to UpdateData

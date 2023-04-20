@@ -26,13 +26,19 @@ namespace TreeControl.Patches
         /// </summary>
         internal const float DefaultElevationAdjustment = 0f;
 
-        private const int MinScalingFactor = 5;
+        /// <summary>
+        /// Minimum tree scaling factor.
+        /// </summary>
+        internal const int MinScalingFactor = 5;
 
         // Tree scaling factor.
         private static byte s_scaling = TreeInstancePatches.DefaultScale;
 
         // Tree elevation adjustment.
         private static float s_elevationAdjustment = DefaultElevationAdjustment;
+
+        // Move It patches and integration.
+        private static MoveItPatches s_moveItPatches;
 
         /// <summary>
         /// Gets or sets the current tree scaling factor.
@@ -44,7 +50,8 @@ namespace TreeControl.Patches
             set
             {
                 // Only change value if a tree is selected.
-                if (Singleton<ToolController>.instance.CurrentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
+                ToolBase currentTool = Singleton<ToolController>.instance.CurrentTool;
+                if ((currentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo) || (s_moveItPatches != null && s_moveItPatches.IsMoveItTree(currentTool)))
                 {
                     // Enforce minimum bound.
                     s_scaling = (byte)Mathf.Clamp(value, MinScalingFactor, byte.MaxValue);
@@ -77,6 +84,22 @@ namespace TreeControl.Patches
         {
             int newValue = s_scaling + Mathf.RoundToInt(increment);
             s_scaling = (byte)Mathf.Clamp(newValue, MinScalingFactor, byte.MaxValue);
+
+            // Change Move It scaling, if applicable.
+            s_moveItPatches?.IncrementTreeSize(increment);
+        }
+
+        /// <summary>
+        /// Enables Move It integration and patching if Move It is enabled.
+        /// </summary>
+        internal static void CheckMoveIt()
+        {
+            // Check for enabled Move It mod.
+            if (AssemblyUtils.GetEnabledAssembly("MoveIt") is Assembly moveIt)
+            {
+                // Create Move It patching instance.
+                s_moveItPatches = new MoveItPatches(moveIt);
+            }
         }
 
         /// <summary>
