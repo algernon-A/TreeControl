@@ -50,14 +50,8 @@ namespace TreeControl.Patches
 
             set
             {
-                // Only change value if a tree is selected.
-                ToolBase currentTool = Singleton<ToolController>.instance.CurrentTool;
-                if ((currentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
-                    || (s_moveItPatches != null && s_moveItPatches.IsMoveItTree(currentTool)))
-                {
-                    // Enforce minimum bound.
-                    s_scaling = (byte)Mathf.Clamp(value, MinScalingFactor, byte.MaxValue);
-                }
+                // Enforce minimum bound.
+                s_scaling = (byte)Mathf.Clamp(value, MinScalingFactor, byte.MaxValue);
             }
         }
 
@@ -88,7 +82,7 @@ namespace TreeControl.Patches
             s_scaling = (byte)Mathf.Clamp(newValue, MinScalingFactor, byte.MaxValue);
 
             // Change Move It scaling, if applicable.
-            s_moveItPatches?.IncrementTreeSize(increment);
+            s_moveItPatches?.IncrementScaling(increment);
         }
 
         /// <summary>

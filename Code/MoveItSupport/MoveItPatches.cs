@@ -76,7 +76,7 @@ namespace TreeControl.MoveItSupport
         /// Applies the given scaling increment to any trees currently selected by Move It.
         /// </summary>
         /// <param name="increment">Scaling increment to apply.</param>
-        internal void IncrementTreeSize(float increment)
+        internal void IncrementScaling(float increment)
         {
             // Check for active Move It tool in its default state.
             if (Singleton<ToolController>.instance.CurrentTool is MoveItTool && MoveItTool.ToolState == MoveItTool.ToolStates.Default)
