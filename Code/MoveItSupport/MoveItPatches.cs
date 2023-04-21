@@ -22,8 +22,7 @@ namespace TreeControl.MoveItSupport
     /// </summary>
     internal class MoveItPatches
     {
-        // Move It type and field - using reflection and delegates here to avoid a hard dependency with Move It.
-        private readonly Type _moveableTreeType;
+        // Move It last instance field.
         private readonly FieldInfo _lastInstance;
 
         /// <summary>
@@ -54,13 +53,6 @@ namespace TreeControl.MoveItSupport
                 Logging.Error("unable to reflect MoveItTool.treeSnapping field");
             }
 
-            // Get Move It MoveableTree type.
-            _moveableTreeType = moveIt.GetType("MoveIt.MoveableTree");
-            if (_moveableTreeType == null)
-            {
-                Logging.Error("unable to reflect MoveIt.MoveableTree");
-            }
-
             // Get last instance field.
             _lastInstance = AccessTools.Field(moveItToolType, "m_lastInstance");
             if (_lastInstance == null)
@@ -68,8 +60,10 @@ namespace TreeControl.MoveItSupport
                 Logging.Error("unable to reflect MoveItTool.m_lastInstance");
             }
 
-            // Apply tranpiler to MoveIt.RenderCloneGeometry.
-            PatcherManager<PatcherBase>.Instance.TranspileMethod(AccessTools.Method(_moveableTreeType, "RenderCloneGeometry"), AccessTools.Method(typeof(MoveItPatches), nameof(RenderCloneGeometryTranspiler)));
+            // Apply SetToolState prefix to reset scaling when selection changes.
+            PatcherManager<PatcherBase>.Instance.PrefixMethod(
+                AccessTools.Method(typeof(MoveItTool), nameof(MoveItTool.SetToolState)),
+                AccessTools.Method(typeof(MoveItPatches), nameof(SetToolStatePrefix)));
         }
 
         /// <summary>
@@ -123,27 +117,11 @@ namespace TreeControl.MoveItSupport
         }
 
         /// <summary>
-        /// Harmony transpiler for MoveIt.MoveableTree.RenderCloneGeometry to implement tree scaling.
+        /// Harmony prefix to MoveItTool.SetToolState to reset scaling when Move It state changes.
         /// </summary>
-        /// <param name="instructions">Original ILCode.</param>
-        /// <returns>Modified ILCode.</returns>
-        private static IEnumerable<CodeInstruction> RenderCloneGeometryTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static void SetToolStatePrefix()
         {
-            // Looking for stloc.3, which stores the previewed tree's scale.
-            foreach (CodeInstruction instruction in instructions)
-            {
-                if (instruction.opcode == OpCodes.Stloc_3)
-                {
-                    // Multiply the calculated value by our scaling factor before storing.
-                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeToolPatches), "s_scaling"));
-                    yield return new CodeInstruction(OpCodes.Conv_R4);
-                    yield return new CodeInstruction(OpCodes.Ldc_R4, TreeInstancePatches.ScaleToFloat);
-                    yield return new CodeInstruction(OpCodes.Mul);
-                    yield return new CodeInstruction(OpCodes.Mul);
-                }
-
-                yield return instruction;
-            }
+            TreeToolPatches.Scaling = TreeInstancePatches.DefaultScale;
         }
     }
 }
