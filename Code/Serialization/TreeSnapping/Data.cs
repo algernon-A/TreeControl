@@ -42,6 +42,7 @@ namespace TreeSnapping
 
                 // Tree buffer length.
                 int bufferSize = treeBuffer.Length;
+                Logging.Message("writing snapping data length ", bufferSize);
                 serializer.WriteInt32(bufferSize);
 
                 // Write tree heights.

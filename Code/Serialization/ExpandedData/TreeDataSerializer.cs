@@ -46,7 +46,7 @@ namespace TreeControl.ExpandedData
 
                 // Write to savegame.
                 serializableDataManager.SaveData(DataID, stream.ToArray());
-                Logging.Message("wrote expanded tree data length ", stream.Length);
+                Logging.Message("wrote expanded tree data size ", stream.Length);
             }
         }
 

@@ -6,6 +6,7 @@
 namespace TreeSnapping
 {
     using System.IO;
+    using AlgernonCommons;
     using ColossalFramework.IO;
     using ICities;
 
@@ -37,6 +38,7 @@ namespace TreeSnapping
 
                 // Write to savegame.
                 serializableDataManager.SaveData(DataID, stream.ToArray());
+                Logging.Message("wrote snapping data size ", stream.Length);
             }
         }
 

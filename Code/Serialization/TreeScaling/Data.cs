@@ -25,12 +25,15 @@ namespace TreeScaling
         {
             try
             {
+                int scalingLength = ScalingArray.Length;
+                Logging.Message("writing scaling data length ", scalingLength);
+
                 // Write data version and array size.
                 serializer.WriteInt32(DataVersion);
-                serializer.WriteInt32(ScalingArray.Length);
+                serializer.WriteInt32(scalingLength);
 
                 // Write each tree scale entry.
-                for (int i = 0; i < ScalingArray.Length; ++i)
+                for (int i = 0; i < scalingLength; ++i)
                 {
                     serializer.WriteFloat(ScalingArray[i] * ScaleToFloat);
                 }

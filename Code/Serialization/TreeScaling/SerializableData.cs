@@ -6,6 +6,7 @@
 namespace TreeScaling
 {
     using System.IO;
+    using AlgernonCommons;
     using ColossalFramework.IO;
     using ICities;
 
@@ -37,6 +38,7 @@ namespace TreeScaling
 
                 // Write to savegame.
                 serializableDataManager.SaveData(DataID, stream.ToArray());
+                Logging.Message("wrote scaling data size ", stream.Length);
             }
         }
 
