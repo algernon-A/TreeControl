@@ -157,7 +157,7 @@ namespace TreeControl.Patches
                 s_scalingData[i] = DefaultScale;
             }
 
-            int anarchySize = size << 6;
+            int anarchySize = size >> 6;
             Logging.Message("creating new anarchy flag data array of size ", anarchySize);
             s_anarchyFlags = new ulong[anarchySize];
         }
