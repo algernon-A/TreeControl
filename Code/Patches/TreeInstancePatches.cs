@@ -381,9 +381,33 @@ namespace TreeControl.Patches
             }
 
             // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
-            if ((!GetAnarchyFlag(treeID) & s_terrainReady) | (!s_terrainReady & s_hideOnLoad))
+            if (s_terrainReady)
             {
-                CheckOverlap(ref __instance, treeID);
+                // Terrain ready - apply normal anarchy.
+                if (!GetAnarchyFlag(treeID))
+                {
+                    CheckOverlap(ref __instance, treeID);
+                }
+            }
+            else
+            {
+                // Terrain not ready - if hiding on load, check overlap regardless of setting.
+                if (s_hideOnLoad)
+                {
+                    // Record initial state.
+                    bool anarchyFlag = GetAnarchyFlag(treeID);
+
+                    // Clear anarchy flag and check overlap.
+                    SetAnarchyFlag(treeID, false);
+                    CheckOverlap(ref __instance, treeID);
+
+                    // If the grow state isn't zero, restore the original anarchy flag.
+                    // Thus, any tree hidden by this has its anarchy flag cleared, but others remain intact.
+                    if (__instance.GrowState != 0)
+                    {
+                        SetAnarchyFlag(treeID, anarchyFlag);
+                    }
+                }
             }
 
             // Don't execute original method.
