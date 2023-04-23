@@ -23,6 +23,14 @@ namespace TreeControl
         private const float GroupMargin = 40f;
         private const float TitleMargin = 50f;
 
+        // Panel components.
+        private readonly UICheckBox _leaveOnLoadCheck;
+        private readonly UICheckBox _hideOnLoadCheck;
+        private readonly UICheckBox _unhideOnLoadCheck;
+
+        // Event handling.
+        private bool _suspendEvents = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GeneralOptions"/> class.
         /// </summary>
@@ -46,11 +54,28 @@ namespace TreeControl
             languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += languageDropDown.parent.height + Margin;
 
+            // Leave on load check.
+            _leaveOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LEAVE_ON_LOAD"));
+            _leaveOnLoadCheck.tooltip = Translations.Translate("LEAVE_ON_LOAD_TIP");
+            _leaveOnLoadCheck.objectUserData = LoadingForceMode.None;
+            _leaveOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.None;
+            _leaveOnLoadCheck.eventCheckChanged += LoadCheckChanged;
+            currentY += _leaveOnLoadCheck.height;
+
             // Hide on load check.
-            UICheckBox hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
-            hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
-            hideOnLoadCheck.isChecked = TreeInstancePatches.HideOnLoad;
-            hideOnLoadCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.HideOnLoad = isChecked; };
+            _hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
+            _hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
+            _hideOnLoadCheck.objectUserData = LoadingForceMode.HideAll;
+            _hideOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.HideAll;
+            _hideOnLoadCheck.eventCheckChanged += LoadCheckChanged;
+            currentY += _hideOnLoadCheck.height;
+
+            // Hide on load check.
+            _unhideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("UNHIDE_ON_LOAD"));
+            _unhideOnLoadCheck.tooltip = Translations.Translate("UNHIDE_ON_LOAD_TIP");
+            _unhideOnLoadCheck.objectUserData = LoadingForceMode.UnhideAll;
+            _unhideOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.UnhideAll;
+            _unhideOnLoadCheck.eventCheckChanged += LoadCheckChanged;
             currentY += GroupMargin;
 
             // Update on terrain change checkboxes.
@@ -107,6 +132,50 @@ namespace TreeControl
             UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
             loggingCheck.isChecked = Logging.DetailLogging;
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
+        }
+
+        /// <summary>
+        /// 'Hide on load' checkbox event handler.
+        /// </summary>
+        /// <param name="c">Calling component.</param>
+        /// <param name="isChecked">New checkbox state.</param>
+        private void LoadCheckChanged(UIComponent c, bool isChecked)
+        {
+            // Don't do anything if events are suspended.
+            if (_suspendEvents)
+            {
+                return;
+            }
+
+            // Suspend event handlng.
+            _suspendEvents = true;
+
+            // Assign value if this is now checked.
+            if (isChecked && c.objectUserData is LoadingForceMode foreeMode)
+            {
+                TreeInstancePatches.ForceOnLoad = foreeMode;
+            }
+
+            // Update checkboxes to reflect new state.
+            _leaveOnLoadCheck.isChecked = false;
+            _hideOnLoadCheck.isChecked = false;
+            _unhideOnLoadCheck.isChecked = false;
+            switch (TreeInstancePatches.ForceOnLoad)
+            {
+                default:
+                case LoadingForceMode.None:
+                    _leaveOnLoadCheck.isChecked = true;
+                    break;
+                case LoadingForceMode.HideAll:
+                    _hideOnLoadCheck.isChecked = true;
+                    break;
+                case LoadingForceMode.UnhideAll:
+                    _unhideOnLoadCheck.isChecked = true;
+                    break;
+            }
+
+            // Resume event handling.
+            _suspendEvents = false;
         }
     }
 }

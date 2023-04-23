@@ -44,7 +44,8 @@ namespace TreeControl
         /// <summary>
         /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
         /// </summary>
-        public bool HideOnLoad { get => TreeInstancePatches.HideOnLoad; set => TreeInstancePatches.HideOnLoad = value; }
+        [XmlElement("ForceOnLoad")]
+        public LoadingForceMode ForceOnLoad { get => TreeInstancePatches.ForceOnLoad; set => TreeInstancePatches.ForceOnLoad = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.

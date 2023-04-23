@@ -54,8 +54,8 @@ namespace TreeControl.Patches
         // Tree scaling data.
         private static byte[] s_scalingData;
 
-        // Anarchy flags.
-        private static bool s_hideOnLoad = true;
+        // Loading forcing.
+        private static LoadingForceMode s_loadingForceMode = LoadingForceMode.None;
 
         // Update on terrain change.
         private static bool s_terrainReady = false;
@@ -76,9 +76,9 @@ namespace TreeControl.Patches
         internal static ulong[] AnarchyFlags => s_anarchyFlags;
 
         /// <summary>
-        /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
+        /// Gets or sets the 'force on loading' mode.
         /// </summary>
-        internal static bool HideOnLoad { get => s_hideOnLoad; set => s_hideOnLoad = value; }
+        internal static LoadingForceMode ForceOnLoad { get => s_loadingForceMode; set => s_loadingForceMode = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.
@@ -94,11 +94,6 @@ namespace TreeControl.Patches
         /// Gets or sets the tree sway factor.
         /// </summary>
         internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
-
-        /// <summary>
-        /// Gets a value indicating whether the 'hide on load' setting is currently enabled (i.e. only during loading).
-        /// </summary>
-        private static bool HideOnLoadActive => Loading.IsLoaded | s_hideOnLoad;
 
         /// <summary>
         /// Sets the anarchy flag for the given tree to the given status.
@@ -236,10 +231,53 @@ namespace TreeControl.Patches
                     trees[i].m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
                 }
 
-                // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
-                if (s_hideOnLoad)
+                // Performing loading force state actions.
+                if (s_loadingForceMode == LoadingForceMode.UnhideAll)
                 {
-                    CheckOverlap(ref trees[i], (uint)i);
+                    // Force-unhiding overlapped trees - record current grow state.
+                    uint treeID = (uint)i;
+
+                    // Only interested in hidden trees.
+                    if (trees[treeID].GrowState == 0)
+                    {
+                        // Get original (current) anarchy state.
+                        bool anarchyFlag = GetAnarchyFlag(treeID);
+
+                        // Artificially change GrowState, set anarchy flag and check overlap.
+                        trees[treeID].GrowState = 1;
+                        SetAnarchyFlag(treeID, true);
+                        CheckOverlap(ref trees[i], treeID);
+
+                        // If the tree remains hidden, restore the original anarchy flag and GrowState.
+                        // Thus, any tree unhidden by this has its anarchy flag set, but others remain intact.
+                        if (trees[i].GrowState == 0)
+                        {
+                            SetAnarchyFlag(treeID, anarchyFlag);
+                        }
+                    }
+                }
+                else if (s_loadingForceMode == LoadingForceMode.HideAll)
+                {
+                    // Force-hiding overlapped trees - record current grow state.
+                    uint treeID = (uint)i;
+
+                    // Only interested in unhidden trees.
+                    if (trees[treeID].GrowState != 0)
+                    {
+                        // Get original (current) anarchy state.
+                        bool anarchyFlag = GetAnarchyFlag(treeID);
+
+                        // Clear anarchy flag and check overlap.
+                        SetAnarchyFlag(treeID, false);
+                        CheckOverlap(ref trees[i], treeID);
+
+                        // If the tree remains unhidden, restore the original anarchy flag.
+                        // Thus, any tree hidden by this has its anarchy flag cleared, but others remain intact.
+                        if (trees[i].GrowState != 0)
+                        {
+                            SetAnarchyFlag(treeID, anarchyFlag);
+                        }
+                    }
                 }
             }
         }
@@ -285,12 +323,6 @@ namespace TreeControl.Patches
                         }
                     }
                 }
-            }
-
-            // Enforce 'hide on load' function.
-            if (!s_terrainReady & s_hideOnLoad)
-            {
-                thisValue = value;
             }
 
             __instance.m_flags = (ushort)((int)(__instance.m_flags & 0xFFFFF0FFu) | Mathf.Clamp(thisValue, 0, 15) << 8);
@@ -387,26 +419,6 @@ namespace TreeControl.Patches
                 if (!GetAnarchyFlag(treeID))
                 {
                     CheckOverlap(ref __instance, treeID);
-                }
-            }
-            else
-            {
-                // Terrain not ready - if hiding on load, check overlap regardless of setting.
-                if (s_hideOnLoad)
-                {
-                    // Record initial state.
-                    bool anarchyFlag = GetAnarchyFlag(treeID);
-
-                    // Clear anarchy flag and check overlap.
-                    SetAnarchyFlag(treeID, false);
-                    CheckOverlap(ref __instance, treeID);
-
-                    // If the grow state isn't zero, restore the original anarchy flag.
-                    // Thus, any tree hidden by this has its anarchy flag cleared, but others remain intact.
-                    if (__instance.GrowState != 0)
-                    {
-                        SetAnarchyFlag(treeID, anarchyFlag);
-                    }
                 }
             }
 
