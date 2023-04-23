@@ -170,7 +170,7 @@ namespace TreeAnarchy
             // Assign new tree buffer.
             treeManager.m_trees = newTreeArray;
             treeManager.m_updatedTrees = new ulong[newTreeBuffer.Length >> 6];
-            TreeInstancePatches.InitializeScalingBuffer((int)newBufferSize);
+            TreeInstancePatches.InitializeDataBuffers((int)newBufferSize);
 
             // Tree scaling.
             if ((Format)serializer.version >= Format.Version6)

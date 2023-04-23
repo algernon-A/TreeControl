@@ -48,11 +48,13 @@ namespace TreeControl.Patches
         /// </summary>
         internal const float FloatToScale = 1 / ScaleToFloat;
 
+        // Tree anarchy data.
+        private static ulong[] s_anarchyFlags;
+
         // Tree scaling data.
         private static byte[] s_scalingData;
 
         // Anarchy flags.
-        private static bool s_anarchyEnabled = false;
         private static bool s_hideOnLoad = true;
 
         // Update on terrain change.
@@ -69,9 +71,9 @@ namespace TreeControl.Patches
         internal static byte[] ScalingArray => s_scalingData;
 
         /// <summary>
-        /// Gets or sets a value indicating whether tree anarchy is enabled.
+        /// Gets the tree anarchy data array.
         /// </summary>
-        internal static bool AnarchyEnabled { get => s_anarchyEnabled; set => s_anarchyEnabled = value; }
+        internal static ulong[] AnarchyFlags => s_anarchyFlags;
 
         /// <summary>
         /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
@@ -99,11 +101,52 @@ namespace TreeControl.Patches
         private static bool HideOnLoadActive => Loading.IsLoaded | s_hideOnLoad;
 
         /// <summary>
-        /// Initializes the scaling buffer.
-        /// MUST be invoked before referencing the buffer (which includes invokation of TreeInstance.PopulateGroupData on game data deserialization).
+        /// Sets the anarchy flag for the given tree to the given status.
+        /// </summary>
+        /// <param name="treeID">Tree ID.</param>
+        /// <param name="status">Status to set.</param>
+        internal static void SetAnarchyFlag(uint treeID, bool status)
+        {
+            // Get flag and mask (binary packed ulong).
+            uint flagsIndex = treeID >> 6;
+            ulong newFlags = s_anarchyFlags[flagsIndex];
+            ulong treeMask = 1u << (int)(treeID & 0x3F);
+
+            // Update flag block.
+            if (status)
+            {
+                // Set flag.
+                newFlags |= treeMask;
+            }
+            else
+            {
+                // Clear flag.
+                newFlags &= ~treeMask;
+            }
+
+            // Update flag.
+            s_anarchyFlags[flagsIndex] = newFlags;
+        }
+
+        /// <summary>
+        /// Gets the anarchy flag for the given tree.
+        /// </summary>
+        /// <param name="treeID">Tree ID.</param>
+        /// <returns>Anarchy flag for the given tree.</returns>
+        internal static bool GetAnarchyFlag(uint treeID)
+        {
+            // Get flag and mask (binary packed ulong).
+            uint flagsIndex = treeID >> 6;
+            ulong treeMask = 1u << (int)(treeID & 0x3F);
+            return (s_anarchyFlags[flagsIndex] & treeMask) != 0;
+        }
+
+        /// <summary>
+        /// Initializes the scaling and anarchy buffers.
+        /// MUST be invoked before referencing either buffer (which includes invokation of TreeInstance.PopulateGroupData on game data deserialization).
         /// </summary>
         /// <param name="size">Buffer size to create.</param>
-        internal static void InitializeScalingBuffer(int size)
+        internal static void InitializeDataBuffers(int size)
         {
             Logging.Message("creating tree scaling data array of size ", size);
             s_scalingData = new byte[size];
@@ -113,6 +156,10 @@ namespace TreeControl.Patches
             {
                 s_scalingData[i] = DefaultScale;
             }
+
+            int anarchySize = size << 6;
+            Logging.Message("creating new anarchy flag data array of size ", anarchySize);
+            s_anarchyFlags = new ulong[anarchySize];
         }
 
         /// <summary>
@@ -209,10 +256,35 @@ namespace TreeControl.Patches
         {
             int thisValue = value;
 
-            // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
-            if (value == 0 & s_anarchyEnabled)
+            // If the tree is being hidden, check tree anarchy status.
+            if (value == 0)
             {
-                thisValue = 1;
+                // Unsafe, because we need to reverse-engineer the instance ID from the address offset.
+                unsafe
+                {
+                    uint treeIndex;
+                    fixed (void* pointer = &__instance)
+                    {
+                        // Calculate instance ID from buffer offset.
+                        TreeInstance* tree = (TreeInstance*)pointer;
+                        fixed (TreeInstance* buffer = Singleton<TreeManager>.instance.m_trees.m_buffer)
+                        {
+                            treeIndex = (uint)(tree - buffer);
+                        }
+
+                        // If anarchy is enabled, override value of 0 and record this tree as having anarchy.
+                        if (TreeManagerPatches.AnarchyEnabled)
+                        {
+                            SetAnarchyFlag(treeIndex, true);
+                            thisValue = 1;
+                        }
+                        else if (GetAnarchyFlag(treeIndex))
+                        {
+                            // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
+                            thisValue = 1;
+                        }
+                    }
+                }
             }
 
             // Enforce 'hide on load' function.
@@ -246,6 +318,7 @@ namespace TreeControl.Patches
                     Logging.KeyMessage("found store m_posY");
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
                     yield return new CodeInstruction(OpCodes.Ldfld, m_posY);
+                    yield return new CodeInstruction(OpCodes.Ldarga, 0);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(TreeInstancePatches), nameof(CalculateElevation)));
                 }
 
@@ -280,7 +353,7 @@ namespace TreeControl.Patches
             }
 
             // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
-            if ((!s_anarchyEnabled & s_terrainReady) | (!s_terrainReady & s_hideOnLoad))
+            if ((!GetAnarchyFlag(treeID) & s_terrainReady) | (!s_terrainReady & s_hideOnLoad))
             {
                 CheckOverlap(ref __instance, treeID);
             }
@@ -500,15 +573,17 @@ namespace TreeControl.Patches
         /// </summary>
         /// <param name="terrainY">Terrain elevation.</param>
         /// <param name="treeY">Tree elevation.</param>
+        /// <param name="instance">Tree instance.</param>
         /// <returns>Calculated tree Y coordinate per current settings.</returns>
-        private static ushort CalculateElevation(ushort terrainY, ushort treeY)
+        private static ushort CalculateElevation(ushort terrainY, ushort treeY, ref TreeInstance instance)
         {
-            // Don't use terrain heights until the terrain is ready.
-            if (s_terrainReady & s_updateOnTerrain)
+            Logging.KeyMessage("CalculateElevation");
+
+            // If "update on terrain" is selected, or if the tree isn't fixed height.
+            if (s_updateOnTerrain | (instance.m_flags & (ushort)TreeInstance.Flags.FixedHeight) == 0)
             {
                 // Default game behaviour - terrain height.
-                // However, only this if the TerrainTool is active, to avoid surface ruining changes triggering a reset of newly-placed trees.
-                return Singleton<ToolController>.instance.CurrentTool is TerrainTool ? terrainY : treeY;
+                return terrainY;
             }
 
             if (s_keepAboveGround)

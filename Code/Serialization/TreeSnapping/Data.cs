@@ -61,7 +61,7 @@ namespace TreeSnapping
         }
 
         /// <summary>
-        /// Reads tree snapping data (tree heights) to savegame.
+        /// Reads tree snapping data (tree heights) from savegame.
         /// </summary>
         /// <param name="serializer">DataSerializer instance.</param>
         public void Deserialize(DataSerializer serializer)

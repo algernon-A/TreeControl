@@ -182,7 +182,7 @@ namespace TreeControl.Patches
             __result = ToolErrors.None;
 
             // If anarchy isn't enabled, go on to execute original method (will override default original result assigned above).
-            return !TreeInstancePatches.AnarchyEnabled;
+            return !TreeManagerPatches.AnarchyEnabled;
         }
 
         /// <summary>

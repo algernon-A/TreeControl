@@ -96,7 +96,7 @@ namespace TreeControl
                     _anarchyKeyProcessed = true;
 
                     // Toggle anarchy.
-                    TreeInstancePatches.AnarchyEnabled = !TreeInstancePatches.AnarchyEnabled;
+                    TreeManagerPatches.AnarchyEnabled = !TreeManagerPatches.AnarchyEnabled;
                 }
             }
             else

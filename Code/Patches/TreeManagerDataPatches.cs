@@ -5,7 +5,6 @@
 
 namespace TreeControl.Patches
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
@@ -15,6 +14,7 @@ namespace TreeControl.Patches
     using ColossalFramework.IO;
     using HarmonyLib;
     using TreeAnarchy;
+    using TreeControl.AnarchyFlags;
     using TreeControl.ExpandedData;
     using UnityEngine;
     using UnlimitedTrees;
@@ -294,7 +294,7 @@ namespace TreeControl.Patches
                     Logging.KeyMessage("not using expanded tree array");
 
                     // Ensure tree scaling array is initialized.
-                    TreeInstancePatches.InitializeScalingBuffer(MAX_TREE_COUNT);
+                    TreeInstancePatches.InitializeDataBuffers(MAX_TREE_COUNT);
                     DeserializeScaling();
                     DeserializeSnapping();
 
@@ -330,8 +330,11 @@ namespace TreeControl.Patches
             int newBufferSize = newTreeArray.m_buffer.Length;
             instance.m_updatedTrees = new ulong[newBufferSize >> 6];
 
-            // Ensure tree scaling array is initialized.
-            TreeInstancePatches.InitializeScalingBuffer(newBufferSize);
+            // Ensure data buffers are initialized.
+            TreeInstancePatches.InitializeDataBuffers(newBufferSize);
+
+            // Read extended data.
+            DeserializeAnarchy();
             DeserializeScaling();
             DeserializeSnapping();
 
@@ -366,6 +369,22 @@ namespace TreeControl.Patches
                 {
                     Logging.Message("found snapping data");
                     DataSerializer.Deserialize<TreeSnapping.Data>(stream, DataSerializer.Mode.Memory, TreeSnapping.Data.LegacyTypeConverter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deserializes anarchy flags.
+        /// </summary>
+        private static void DeserializeAnarchy()
+        {
+            if (Singleton<SimulationManager>.instance.m_serializableDataStorage.TryGetValue(AnarchyFlagSerializer.DataID, out byte[] data))
+            {
+                // Yes - load it.
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    Logging.Message("found anarchy flags");
+                    DataSerializer.Deserialize<AnarchyFlagContainer>(stream, DataSerializer.Mode.Memory);
                 }
             }
         }

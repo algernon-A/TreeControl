@@ -1,9 +1,9 @@
-﻿// <copyright file="Data.cs" company="algernon (K. Algernon A. Sheppard)">
+﻿// <copyright file="AnarchyFlagContainer.cs" company="algernon (K. Algernon A. Sheppard)">
 // Copyright (c) algernon (K. Algernon A. Sheppard), SamSamTS. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
 
-namespace TreeScaling
+namespace TreeControl.AnarchyFlags
 {
     using System;
     using AlgernonCommons;
@@ -11,9 +11,9 @@ namespace TreeScaling
     using static TreeControl.Patches.TreeInstancePatches;
 
     /// <summary>
-    /// Savegame data container for tree scaling data.
+    /// Savegame data container for tree anarchy flags.
     /// </summary>
-    public sealed class Data : IDataContainer
+    public sealed class AnarchyFlagContainer : IDataContainer
     {
         private const int DataVersion = 0;
 
@@ -25,27 +25,27 @@ namespace TreeScaling
         {
             try
             {
-                int scalingLength = ScalingArray.Length;
-                Logging.Message("writing scaling data length ", scalingLength);
+                int flagsLength = AnarchyFlags.Length;
+                Logging.Message("writing anarchy flags length ", flagsLength);
 
                 // Write data version and array size.
                 serializer.WriteInt32(DataVersion);
-                serializer.WriteInt32(scalingLength);
+                serializer.WriteInt32(flagsLength);
 
                 // Write each tree scale entry.
-                for (int i = 0; i < scalingLength; ++i)
+                for (int i = 0; i < flagsLength; ++i)
                 {
-                    serializer.WriteFloat(ScalingArray[i] * ScaleToFloat);
+                    serializer.WriteULong64(AnarchyFlags[i]);
                 }
             }
             catch (Exception e)
             {
-                Logging.LogException(e, "exception serializing tree scaling data");
+                Logging.LogException(e, "exception serializing anarchy flags");
             }
         }
 
         /// <summary>
-        /// Reads tree scaling data from savegame.
+        /// Reads anarchy flags from savegame.
         /// </summary>
         /// <param name="serializer">DataSerializer instance.</param>
         public void Deserialize(DataSerializer serializer)
@@ -58,7 +58,7 @@ namespace TreeScaling
                 int version = serializer.ReadInt32();
                 if (version > DataVersion)
                 {
-                    Logging.Error("invalid scaling data version ", version, "; aborting read");
+                    Logging.Error("invalid anarchy flags version ", version, "; aborting read");
                     return;
                 }
 
@@ -66,29 +66,17 @@ namespace TreeScaling
                 int dataSize = serializer.ReadInt32();
 
                 // Get tree buffer size.
-                int bufferSize = ScalingArray.Length;
+                int bufferSize = AnarchyFlags.Length;
 
-                // Read each tree scale entry.
+                // Read each anarchy flag entry.
                 for (int i = 0; i < dataSize; ++i)
                 {
-                    float scale = serializer.ReadFloat();
-
-                    // Bounds check on buffer length.
-                    if (i < bufferSize)
-                    {
-                        // Check for invalid data and set to 1.
-                        if (scale == 0f | scale == float.NaN)
-                        {
-                            scale = 1f;
-                        }
-                    }
-
-                    ScalingArray[i] = (byte)(scale * FloatToScale);
+                    AnarchyFlags[i] = serializer.ReadULong64();
                 }
             }
             catch (Exception e)
             {
-                Logging.LogException(e, "exception deserializing tree scaling data");
+                Logging.LogException(e, "exception deserializing anarchy flags");
             }
         }
 

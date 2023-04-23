@@ -1,3 +1,5 @@
+- Overhaul anarchy behavior: anarchy is now persistent and assigned per-tree; trees without anarchy status will revert to normal tree behavior
+- Overhaul snapping behavior: snapping status is now persistent and assigned per-tree; trees without snapping adjustments will revert to normal tree behavior
 - Add Move It integration
 
 

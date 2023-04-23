@@ -21,13 +21,18 @@ namespace TreeControl.Patches
     internal static class TreeManagerPatches
     {
         /// <summary>
+        /// Gets or sets a value indicating whether tree anarchy is enabled.
+        /// </summary>
+        internal static bool AnarchyEnabled { get; set; } = false;
+
+        /// <summary>
         /// Harmony transpiler for TreeManager.CheckLimits to implement expanded tree limits.
         /// </summary>
         /// <param name="instructions">Original ILCode.</param>
         /// <returns>Modified ILCode.</returns>
         [HarmonyPatch(nameof(TreeManager.CheckLimits))]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> CheckOverlapTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> CheckLimitsTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             FieldInfo m_trees = AccessTools.Field(typeof(TreeManager), nameof(m_trees));
             FieldInfo m_Buffer = AccessTools.Field(typeof(Array32<TreeInstance>), nameof(Array32<TreeInstance>.m_buffer));
@@ -116,15 +121,25 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony postfix to TreeManager.CreateTree to implement tree snapping.
+        /// Harmony postfix to TreeManager.CreateTree to implement anarchy, snapping and scaling.
         /// </summary>>
+        /// <param name="__instance">TreeManager instance.</param>
         /// <param name="tree">ID of newly-created tree.</param>
         [HarmonyPatch(nameof(TreeManager.CreateTree))]
         [HarmonyPostfix]
-        private static void CreateTreePostfix(uint tree)
+        private static void CreateTreePostfix(TreeManager __instance, uint tree)
         {
+            // Set anarchy flag.
+            TreeInstancePatches.SetAnarchyFlag(tree, AnarchyEnabled);
+
             // Record scale.
             TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;
+
+            // Set fixed height sate if tree wasn't at standard height.
+            if (TreeToolPatches.ElevationAdjustment != 0f)
+            {
+                __instance.m_trees.m_buffer[tree].m_flags |= (ushort)TreeInstance.Flags.FixedHeight;
+            }
         }
     }
 }
