@@ -309,9 +309,10 @@ namespace TreeControl.Patches
         {
             FieldInfo m_posY = AccessTools.Field(typeof(TreeInstance), nameof(TreeInstance.m_posY));
 
-            // Looking for store to ushort num (local var 1).
+            // Iterate through each instruction.
             foreach (CodeInstruction instruction in instructions)
             {
+                // Looking for store to ushort num (local var 1).
                 if (instruction.StoresField(m_posY))
                 {
                     // Insert call to our custom method.
@@ -323,6 +324,33 @@ namespace TreeControl.Patches
                 }
 
                 yield return instruction;
+            }
+        }
+
+        /// <summary>
+        /// Harmony postfix to TreeInstance.AfterTerrainUpdated to implement tree terrain height changes for fixed-height trees.
+        /// </summary>
+        /// <param name="__instance">TreeInstance instance.</param>
+        /// <param name="treeID">Tree ID.</param>
+        [HarmonyPatch(nameof(TreeInstance.AfterTerrainUpdated))]
+        [HarmonyPostfix]
+        private static void AfterTerrainUpdatedPostfix(ref TreeInstance __instance, uint treeID)
+        {
+            // Only concerned with created and fixed-height trees (non-fixed-height trees will have been dealt with by the base method).
+            if ((__instance.m_flags & (ushort)(TreeInstance.Flags.Created | TreeInstance.Flags.FixedHeight)) == (ushort)(TreeInstance.Flags.Created | TreeInstance.Flags.FixedHeight))
+            {
+                // Mimics game code.
+                // Calculate terrain elevation.
+                Vector3 position = __instance.Position;
+                position.y = Singleton<TerrainManager>.instance.SampleDetailHeight(position);
+                ushort terrainHeight = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
+
+                // If terrain elevation doesn't match tree height, recalculate the tree's position according to current settings.
+                if (terrainHeight != __instance.m_posY)
+                {
+                    __instance.m_posY = CalculateElevation(terrainHeight, __instance.m_posY, ref __instance);
+                    Singleton<TreeManager>.instance.UpdateTreeRenderer(treeID, updateGroup: true);
+                }
             }
         }
 
