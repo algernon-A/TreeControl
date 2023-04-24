@@ -1,6 +1,6 @@
 - Overhaul anarchy behavior: anarchy is now persistent and assigned per-tree; trees without anarchy status will revert to normal tree behavior
 - Overhaul snapping behavior: snapping status is now persistent and assigned per-tree; trees without snapping adjustments will revert to normal tree behavior
-- Add new hide/unhide/leave untouched loading options to reflect new anarchy behavior
+- Add new leave/hide/unhide/delete untouched loading options (separate for network and building overlaps) to reflect new anarchy behavior
 - Add Move It integration
 
 

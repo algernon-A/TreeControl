@@ -12,6 +12,7 @@ namespace TreeControl.Patches
     using System.Runtime.CompilerServices;
     using AlgernonCommons;
     using ColossalFramework;
+    using ColossalFramework.Math;
     using HarmonyLib;
     using UnityEngine;
     using TreeInstance = global::TreeInstance;
@@ -54,8 +55,9 @@ namespace TreeControl.Patches
         // Tree scaling data.
         private static byte[] s_scalingData;
 
-        // Loading forcing.
-        private static LoadingForceMode s_loadingForceMode = LoadingForceMode.None;
+        // Overlap forcing.
+        private static OverlapMode s_networkForceMode = OverlapMode.None;
+        private static OverlapMode s_buildingForceMode = OverlapMode.None;
 
         // Update on terrain change.
         private static bool s_terrainReady = false;
@@ -76,9 +78,14 @@ namespace TreeControl.Patches
         internal static ulong[] AnarchyFlags => s_anarchyFlags;
 
         /// <summary>
-        /// Gets or sets the 'force on loading' mode.
+        /// Gets or sets the network 'force on loading' mode.
         /// </summary>
-        internal static LoadingForceMode ForceOnLoad { get => s_loadingForceMode; set => s_loadingForceMode = value; }
+        internal static OverlapMode NetworkOverlap { get => s_networkForceMode; set => s_networkForceMode = value; }
+
+        /// <summary>
+        /// Gets or sets the building 'force on loading' mode.
+        /// </summary>
+        internal static OverlapMode BuildingOverlap { get => s_buildingForceMode; set => s_buildingForceMode = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.
@@ -214,6 +221,20 @@ namespace TreeControl.Patches
         {
             TreeInstance[] trees = treeManager.m_trees.m_buffer;
 
+            // Determine state.
+            bool networkHide = s_networkForceMode == OverlapMode.Hide;
+            bool buildingHide = s_buildingForceMode == OverlapMode.Hide;
+            bool networkUnhide = s_networkForceMode == OverlapMode.Unhide;
+            bool buildingUnhide = s_buildingForceMode == OverlapMode.Unhide;
+            bool networkDelete = s_networkForceMode == OverlapMode.Delete;
+            bool buildingDelete = s_buildingForceMode == OverlapMode.Delete;
+            bool hiding = networkHide | buildingHide;
+            bool unhiding = networkUnhide | buildingUnhide;
+            bool deleting = networkDelete | buildingDelete;
+
+            Logging.Message("updating trees with hiding ", hiding, " unhiding ", unhiding, " deleting ", deleting);
+
+            // Iterate through all trees.
             for (int i = 0; i < trees.Length; ++i)
             {
                 // Only do this for created trees with no recorded Y position
@@ -232,53 +253,128 @@ namespace TreeControl.Patches
                 }
 
                 // Performing loading force state actions.
-                if (s_loadingForceMode == LoadingForceMode.UnhideAll)
+                if (unhiding)
                 {
-                    // Force-unhiding overlapped trees - record current grow state.
+                    // Force-unhiding overlapped trees.
                     uint treeID = (uint)i;
 
-                    // Only interested in hidden trees.
-                    if (trees[treeID].GrowState == 0)
+                    if (CheckOverlap(treeID, ref trees[i], networkUnhide, buildingUnhide))
                     {
-                        // Get original (current) anarchy state.
-                        bool anarchyFlag = GetAnarchyFlag(treeID);
-
-                        // Artificially change GrowState, set anarchy flag and check overlap.
-                        trees[treeID].GrowState = 1;
                         SetAnarchyFlag(treeID, true);
-                        CheckOverlap(ref trees[i], treeID);
-
-                        // If the tree remains hidden, restore the original anarchy flag and GrowState.
-                        // Thus, any tree unhidden by this has its anarchy flag set, but others remain intact.
-                        if (trees[i].GrowState == 0)
-                        {
-                            SetAnarchyFlag(treeID, anarchyFlag);
-                        }
+                        UpdateTreeVisibility(ref trees[i], true);
+                        Logging.Message("unhiding tree ", treeID);
                     }
                 }
-                else if (s_loadingForceMode == LoadingForceMode.HideAll)
+
+                if (hiding)
                 {
-                    // Force-hiding overlapped trees - record current grow state.
+                    // Force-hiding overlapped trees.
                     uint treeID = (uint)i;
 
-                    // Only interested in unhidden trees.
-                    if (trees[treeID].GrowState != 0)
+                    if (CheckOverlap(treeID, ref trees[i], networkHide, buildingHide))
                     {
-                        // Get original (current) anarchy state.
-                        bool anarchyFlag = GetAnarchyFlag(treeID);
-
-                        // Clear anarchy flag and check overlap.
                         SetAnarchyFlag(treeID, false);
-                        CheckOverlap(ref trees[i], treeID);
-
-                        // If the tree remains unhidden, restore the original anarchy flag.
-                        // Thus, any tree hidden by this has its anarchy flag cleared, but others remain intact.
-                        if (trees[i].GrowState != 0)
-                        {
-                            SetAnarchyFlag(treeID, anarchyFlag);
-                        }
+                        UpdateTreeVisibility(ref trees[i], false);
+                        Logging.Message("hiding tree ", treeID);
                     }
                 }
+
+                if (deleting)
+                {
+                    // Force-deleting overlapped trees.
+                    uint treeID = (uint)i;
+
+                    if (CheckOverlap(treeID, ref trees[i], networkDelete, buildingDelete))
+                    {
+                        treeManager.ReleaseTree(treeID);
+                        Logging.Message("deleting tree ", treeID);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks the given tree for overlap.
+        /// Based on game code.
+        /// </summary>
+        /// <param name="treeID">Tree ID.</param>
+        /// <param name="instance">Tree data reference.</param>
+        /// <param name="checkNetworks"><c>true</c> to check for network overlap, <c>false</c> to ignore networks.</param>
+        /// <param name="checkBuilding"><c>true</c> to check for building overlap, <c>false</c> to ignore building.</param>
+        /// <returns><c>true</c> if an overlap is detected, <c>false</c> if no overlap.</returns>
+        private static bool CheckOverlap(uint treeID, ref TreeInstance instance, bool checkNetworks, bool checkBuilding)
+        {
+            // Null check.
+            TreeInfo info = instance.Info;
+            if (!info)
+            {
+                return false;
+            }
+
+            // Determine collision type.
+            ItemClass.CollisionType collisionType = (instance.m_flags & (ushort)TreeInstance.Flags.FixedHeight) != 0 ? ItemClass.CollisionType.Elevated : ItemClass.CollisionType.Terrain;
+
+            // Calculate tree height.
+            Randomizer randomizer = new Randomizer(treeID);
+            float scale = info.m_minScale + (randomizer.Int32(10000u) * (info.m_maxScale - info.m_minScale) * 0.0001f);
+            float height = info.m_generatedInfo.m_size.y * scale;
+
+            // Calculate position.
+            Vector3 position = instance.Position;
+            float baseY = position.y;
+            float maxY = position.y + height;
+
+            // Radius depends on whether this is a single or clustered tree.
+            float radius = instance.Single ? 0.3f : 4.5f;
+
+            // Calculate collision quad.
+            Quad2 quad = default;
+            Vector2 vector = VectorUtils.XZ(position);
+            quad.a = vector + new Vector2(0f - radius, 0f - radius);
+            quad.b = vector + new Vector2(0f - radius, radius);
+            quad.c = vector + new Vector2(radius, radius);
+            quad.d = vector + new Vector2(radius, 0f - radius);
+
+            // Check network collision, if appropriate.
+            bool colliding = false;
+            if (checkNetworks)
+            {
+                colliding = Singleton<NetManager>.instance.OverlapQuad(quad, baseY, maxY, collisionType, info.m_class.m_layer, 0, 0, 0);
+            }
+
+            if (!colliding & checkBuilding)
+            {
+                colliding = Singleton<BuildingManager>.instance.OverlapQuad(quad, baseY, maxY, collisionType, info.m_class.m_layer, 0, 0, 0);
+            }
+
+            return colliding;
+        }
+
+        /// <summary>
+        /// Updates the given tree based on applied collision status.
+        /// </summary>
+        /// <param name="instance">Tree date reference.</param>
+        /// <param name="isVisible"><c>true</c> to hide tree, <false>to show tree</false>.</param>
+        private static void UpdateTreeVisibility(ref TreeInstance instance, bool isVisible)
+        {
+            if (!isVisible)
+            {
+                // Tree is being hidden, where it was visible.
+                if (instance.GrowState != 0)
+                {
+                    instance.GrowState = 0;
+                    DistrictManager districtManager = Singleton<DistrictManager>.instance;
+                    byte park = districtManager.GetPark(instance.Position);
+                    --districtManager.m_parks.m_buffer[park].m_treeCount;
+                }
+            }
+            else if (instance.GrowState == 0)
+            {
+                // Tree is being shown, where it was hiddenFIr.
+                instance.GrowState = 1;
+                DistrictManager districtManager = Singleton<DistrictManager>.instance;
+                byte park2 = districtManager.GetPark(instance.Position);
+                ++districtManager.m_parks.m_buffer[park2].m_treeCount;
             }
         }
 

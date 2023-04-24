@@ -42,10 +42,16 @@ namespace TreeControl
         public TreeLODControl.Resolution LODResolution { get => TreeLODControl.CurrentResolution; set => TreeLODControl.CurrentResolution = value; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether trees under networks or buildings should be hidden on game load.
+        /// Gets or sets the network 'force on loading' mode.
         /// </summary>
-        [XmlElement("ForceOnLoad")]
-        public LoadingForceMode ForceOnLoad { get => TreeInstancePatches.ForceOnLoad; set => TreeInstancePatches.ForceOnLoad = value; }
+        [XmlElement("NetworkOverlap")]
+        public OverlapMode NetworkOverlap { get => TreeInstancePatches.NetworkOverlap; set => TreeInstancePatches.NetworkOverlap = value; }
+
+        /// <summary>
+        /// Gets or sets the building 'force on loading' mode.
+        /// </summary>
+        [XmlElement("BuildingOverlap")]
+        public OverlapMode BuildingOverlap { get => TreeInstancePatches.BuildingOverlap; set => TreeInstancePatches.BuildingOverlap = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tree Y-positions should be updated on terrain changes.

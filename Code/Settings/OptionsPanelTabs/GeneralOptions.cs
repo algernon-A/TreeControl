@@ -22,14 +22,11 @@ namespace TreeControl
         private const float LeftMargin = 24f;
         private const float GroupMargin = 40f;
         private const float TitleMargin = 50f;
+        private const float MenuX = LeftMargin + 300f;
 
         // Panel components.
-        private readonly UICheckBox _leaveOnLoadCheck;
-        private readonly UICheckBox _hideOnLoadCheck;
-        private readonly UICheckBox _unhideOnLoadCheck;
-
-        // Event handling.
-        private bool _suspendEvents = false;
+        private readonly UIDropDown _networkDropDown;
+        private readonly UIDropDown _buildingDropDown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GeneralOptions"/> class.
@@ -44,6 +41,9 @@ namespace TreeControl
             // Y position indicator.
             float currentY = GroupMargin;
 
+            // Header.
+            float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
+
             // Language choice.
             UIDropDown languageDropDown = UIDropDowns.AddPlainDropDown(panel, LeftMargin, currentY, Translations.Translate("LANGUAGE_CHOICE"), Translations.LanguageList, Translations.Index);
             languageDropDown.eventSelectedIndexChanged += (control, index) =>
@@ -54,29 +54,33 @@ namespace TreeControl
             languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += languageDropDown.parent.height + Margin;
 
-            // Leave on load check.
-            _leaveOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LEAVE_ON_LOAD"));
-            _leaveOnLoadCheck.tooltip = Translations.Translate("LEAVE_ON_LOAD_TIP");
-            _leaveOnLoadCheck.objectUserData = LoadingForceMode.None;
-            _leaveOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.None;
-            _leaveOnLoadCheck.eventCheckChanged += LoadCheckChanged;
-            currentY += _leaveOnLoadCheck.height;
+            string[] loadOptions = new string[]
+            {
+                Translations.Translate("LEAVE"),
+                Translations.Translate("HIDE"),
+                Translations.Translate("UNHIDE"),
+                Translations.Translate("DELETE"),
+            };
 
-            // Hide on load check.
-            _hideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("HIDE_ON_LOAD"));
-            _hideOnLoadCheck.tooltip = Translations.Translate("HIDE_ON_LOAD_TIP");
-            _hideOnLoadCheck.objectUserData = LoadingForceMode.HideAll;
-            _hideOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.HideAll;
-            _hideOnLoadCheck.eventCheckChanged += LoadCheckChanged;
-            currentY += _hideOnLoadCheck.height;
+            // Loading options.
+            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("LOAD_OPTIONS"));
+            currentY += TitleMargin;
 
-            // Hide on load check.
-            _unhideOnLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("UNHIDE_ON_LOAD"));
-            _unhideOnLoadCheck.tooltip = Translations.Translate("UNHIDE_ON_LOAD_TIP");
-            _unhideOnLoadCheck.objectUserData = LoadingForceMode.UnhideAll;
-            _unhideOnLoadCheck.isChecked = TreeInstancePatches.ForceOnLoad == LoadingForceMode.UnhideAll;
-            _unhideOnLoadCheck.eventCheckChanged += LoadCheckChanged;
-            currentY += GroupMargin;
+            // Network hiding options.
+            _networkDropDown = OverlapDropdown(panel, currentY, "NETWORK_OVERLAP", loadOptions);
+            _networkDropDown.selectedIndex = (int)TreeInstancePatches.NetworkOverlap;
+            _networkDropDown.eventSelectedIndexChanged += (c, index) => TreeInstancePatches.NetworkOverlap = (OverlapMode)index;
+            currentY += _networkDropDown.height + Margin;
+
+            // Building hiding options.
+            _buildingDropDown = OverlapDropdown(panel, currentY, "BUILDING_OVERLAP", loadOptions);
+            _buildingDropDown.selectedIndex = (int)TreeInstancePatches.BuildingOverlap;
+            _buildingDropDown.eventSelectedIndexChanged += (c, index) => TreeInstancePatches.BuildingOverlap = (OverlapMode)index;
+            currentY += TitleMargin;
+
+            // Tree options.
+            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("TREE_OPTIONS"));
+            currentY += TitleMargin;
 
             // Update on terrain change checkboxes.
             UICheckBox terrainUpdateCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("TERRAIN_UPDATE"));
@@ -89,11 +93,18 @@ namespace TreeControl
             keepAboveGroundCheck.tooltip = Translations.Translate("KEEP_ABOVEGROUND_TIP");
             keepAboveGroundCheck.isChecked = TreeInstancePatches.KeepAboveGround;
             keepAboveGroundCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.KeepAboveGround = isChecked; };
-            currentY += keepAboveGroundCheck.height + 20f;
+            currentY += keepAboveGroundCheck.height;
+
+            // Lock forestry check.
+            UICheckBox lockForestryCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LOCK_FORESTRY"));
+            lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_TIP");
+            lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestry;
+            lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestry = isChecked; };
+            currentY += lockForestryCheck.height + Margin;
 
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(panel, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
-            currentY += swayFactorSlider.parent.height + 15f;
+            currentY += swayFactorSlider.parent.height + Margin;
 
             // Tree LOD detail.
             string[] lodDetailLevels = new string[(int)TreeLODControl.Resolution.NumResolutions]
@@ -108,15 +119,7 @@ namespace TreeControl
             lodDropDown.eventSelectedIndexChanged += (c, index) => TreeLODControl.CurrentResolution = (TreeLODControl.Resolution)index;
             currentY += lodDropDown.parent.height + 20f;
 
-            // Hide on load check.
-            UICheckBox lockForestryCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LOCK_FORESTRY"));
-            lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_TIP");
-            lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestry;
-            lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestry = isChecked; };
-            currentY += lockForestryCheck.height + GroupMargin;
-
             // Troubleshooting options.
-            float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
             UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("TROUBLESHOOTING"));
             currentY += TitleMargin;
 
@@ -125,7 +128,7 @@ namespace TreeControl
             ignoreTreeAnarchyCheck.tooltip = Translations.Translate("IGNORE_TA_DATA_TIP");
             ignoreTreeAnarchyCheck.isChecked = TreeManagerDataPatches.IgnoreTreeAnarchyData;
             ignoreTreeAnarchyCheck.eventCheckChanged += (c, isChecked) => { TreeManagerDataPatches.IgnoreTreeAnarchyData = isChecked; };
-            currentY += GroupMargin;
+            currentY += ignoreTreeAnarchyCheck.height;
             ignoreTreeAnarchyCheck.tooltipBox = UIToolTips.WordWrapToolTip;
 
             // Logging checkbox.
@@ -135,47 +138,31 @@ namespace TreeControl
         }
 
         /// <summary>
-        /// 'Hide on load' checkbox event handler.
+        /// Adds an overlap mode dropdown.
         /// </summary>
-        /// <param name="c">Calling component.</param>
-        /// <param name="isChecked">New checkbox state.</param>
-        private void LoadCheckChanged(UIComponent c, bool isChecked)
+        /// <param name="parent">Parent <see cref="UIComponent"/>.</param>
+        /// <param name="yPos">Relative Y position.</param>
+        /// <param name="titleKey">Title label translation key.</param>
+        /// <param name="items">Menu items.</param>
+        /// <returns>New <see cref="UIDropDown"/>.</returns>
+        private UIDropDown OverlapDropdown(UIComponent parent, float yPos, string titleKey, string[] items)
         {
-            // Don't do anything if events are suspended.
-            if (_suspendEvents)
-            {
-                return;
-            }
+            UIDropDown dropDown = UIDropDowns.AddLabelledDropDown(
+                parent,
+                MenuX,
+                yPos,
+                Translations.Translate(titleKey),
+                height: 30f,
+                width: 320f,
+                labelTextScale: 1f,
+                itemTextScale: 1f,
+                itemHeight: 24,
+                vertPadding: 7,
+                itemVertPadding: 4,
+                accomodateLabel: false);
 
-            // Suspend event handlng.
-            _suspendEvents = true;
-
-            // Assign value if this is now checked.
-            if (isChecked && c.objectUserData is LoadingForceMode foreeMode)
-            {
-                TreeInstancePatches.ForceOnLoad = foreeMode;
-            }
-
-            // Update checkboxes to reflect new state.
-            _leaveOnLoadCheck.isChecked = false;
-            _hideOnLoadCheck.isChecked = false;
-            _unhideOnLoadCheck.isChecked = false;
-            switch (TreeInstancePatches.ForceOnLoad)
-            {
-                default:
-                case LoadingForceMode.None:
-                    _leaveOnLoadCheck.isChecked = true;
-                    break;
-                case LoadingForceMode.HideAll:
-                    _hideOnLoadCheck.isChecked = true;
-                    break;
-                case LoadingForceMode.UnhideAll:
-                    _unhideOnLoadCheck.isChecked = true;
-                    break;
-            }
-
-            // Resume event handling.
-            _suspendEvents = false;
+            dropDown.items = items;
+            return dropDown;
         }
     }
 }
