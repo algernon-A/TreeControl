@@ -737,8 +737,6 @@ namespace TreeControl.Patches
         /// <returns>Calculated tree Y coordinate per current settings.</returns>
         private static ushort CalculateElevation(ushort terrainY, ushort treeY, ref TreeInstance instance)
         {
-            Logging.KeyMessage("CalculateElevation");
-
             // If "update on terrain" is selected, or if the tree isn't fixed height.
             if (s_updateOnTerrain | (instance.m_flags & (ushort)TreeInstance.Flags.FixedHeight) == 0)
             {
