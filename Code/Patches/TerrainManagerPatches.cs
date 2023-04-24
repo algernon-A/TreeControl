@@ -12,7 +12,7 @@ namespace TreeControl.Patches
     /// <summary>
     /// Harmony patches to implement tree slope limit adjustment.
     /// </summary>
-    [HarmonyPatch(typeof(TerrainManager))]
+    //[HarmonyPatch(typeof(TerrainManager))]
     internal static class TerrainManagerPatches
     {
         /// <summary>
