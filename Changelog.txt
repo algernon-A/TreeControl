@@ -1,5 +1,5 @@
 - Implement icon status panel
-
+- Apply fixed height flag to all trees deserialized from old Tree Snapping mod
 
 Version 0.9.5 -
 
