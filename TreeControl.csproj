@@ -7,7 +7,7 @@
 		<Authors>algernon</Authors>
 		<Copyright>Copyright © 2023 algernon</Copyright>
 		<Product>$(Title)</Product>
-		<Version>0.9.5</Version>
+		<Version>0.9.5.1</Version>
 		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
 		<MoveItPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/1619685021</MoveItPath>
 		<AssemblySearchPaths>
