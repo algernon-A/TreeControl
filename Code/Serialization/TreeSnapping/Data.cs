@@ -17,6 +17,8 @@ namespace TreeSnapping
     /// </summary>
     public sealed class Data : IDataContainer
     {
+        private static bool s_convertingLegacy = false;
+
         /// <summary>
         /// Legacy container type converter.
         /// </summary>
@@ -24,7 +26,11 @@ namespace TreeSnapping
         /// <returns>Data type.</returns>
         public static Type LegacyTypeConverter(string legacyTypeName)
         {
-            Logging.Message("converting Tree Anarchy data type ", legacyTypeName);
+            if (!legacyTypeName.StartsWith("TreeSnapping.Data, TreeControl"))
+            {
+                Logging.Message("converting legacy Tree Snapping data type ", legacyTypeName);
+                s_convertingLegacy = true;
+            }
 
             return typeof(Data);
         }
@@ -91,6 +97,10 @@ namespace TreeSnapping
                         if (height != 0 & height != ushort.MaxValue)
                         {
                             treeBuffer[i].m_posY = height;
+                            if (s_convertingLegacy)
+                            {
+                                treeBuffer[i].FixedHeight = true;
+                            }
                         }
                         else
                         {

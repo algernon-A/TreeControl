@@ -1,3 +1,5 @@
+- Apply fixed height flag to all trees deserialized from old Tree Snapping mod
+
 Version 0.9.5 -
 
 - Overhaul anarchy behavior: anarchy is now persistent and assigned per-tree; trees without anarchy status will revert to normal tree behavior
