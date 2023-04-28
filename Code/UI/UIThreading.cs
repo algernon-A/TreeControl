@@ -30,8 +30,10 @@ namespace TreeControl
         // Delay before key repeating activates.
         private static float s_initialRepeatDelay = 0.35f;
 
-        // Hotkey.
+        // Hotkeys.
         private static Keybinding s_anarchyKey = new Keybinding(KeyCode.A, false, false, true);
+        private static Keybinding s_snappingKey = new Keybinding(KeyCode.S, false, false, true);
+        private static Keybinding s_forestryKey = new Keybinding(KeyCode.F, false, false, true);
 
         // Function keys.
         private static Keybinding s_scaleUpKey = new Keybinding(KeyCode.Period, false, false, false);
@@ -41,6 +43,8 @@ namespace TreeControl
 
         // Flags.
         private bool _anarchyKeyProcessed = false;
+        private bool _snappingKeyProcessed = false;
+        private bool _forestryKeyProcessed = false;
         private bool _scaleUpKeyProcessed = false;
         private bool _scaleDownKeyProcessed = false;
         private bool _elevationUpKeyProcessed = false;
@@ -53,6 +57,16 @@ namespace TreeControl
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
         internal static Keybinding AnarchyKey { get => s_anarchyKey; set => s_anarchyKey = value; }
+
+        /// <summary>
+        /// Gets or sets the tree snapping hotkey.
+        /// </summary>
+        internal static Keybinding SnappingKey { get => s_snappingKey; set => s_snappingKey = value; }
+
+        /// <summary>
+        /// Gets or sets the lock forestry hotkey.
+        /// </summary>
+        internal static Keybinding ForestryKey { get => s_forestryKey; set => s_forestryKey = value; }
 
         /// <summary>
         /// Gets or sets the tree upscaling key.
@@ -103,6 +117,44 @@ namespace TreeControl
             {
                 // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
                 _anarchyKeyProcessed = false;
+            }
+
+            // Check for snapping hotkey.
+            if (s_snappingKey.IsPressed())
+            {
+                // Only process if we're not already doing so.
+                if (!_snappingKeyProcessed)
+                {
+                    // Set processed flag.
+                    _snappingKeyProcessed = true;
+
+                    // Toggle anarchy.
+                    TreeToolPatches.SnappingEnabled = !TreeToolPatches.SnappingEnabled;
+                }
+            }
+            else
+            {
+                // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
+                _snappingKeyProcessed = false;
+            }
+
+            // Check for lock forestry hotkey.
+            if (s_forestryKey.IsPressed())
+            {
+                // Only process if we're not already doing so.
+                if (!_forestryKeyProcessed)
+                {
+                    // Set processed flag.
+                    _forestryKeyProcessed = true;
+
+                    // Toggle anarchy.
+                    NaturalResourceManagerPatches.LockForestry = !NaturalResourceManagerPatches.LockForestry;
+                }
+            }
+            else
+            {
+                // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
+                _forestryKeyProcessed = false;
             }
 
             // Check for upscaling keypress.

@@ -9,7 +9,6 @@ namespace TreeControl
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
-    using UnityEngine;
 
     /// <summary>
     /// Options panel for setting key options.
@@ -35,40 +34,34 @@ namespace TreeControl
             float currentY = GroupMargin;
 
             // Anarchy hotkey control.
-            OptionsKeymapping anarchyKeyMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
-            anarchyKeyMapping.Label = Translations.Translate("KEY_ANARCHY");
-            anarchyKeyMapping.Binding = UIThreading.AnarchyKey;
-            anarchyKeyMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            OptionsKeymapping anarchyKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_ANARCHY"), UIThreading.AnarchyKey);
             currentY += anarchyKeyMapping.Panel.height + Margin;
 
+            // Snapping hotkey control.
+            OptionsKeymapping snappingKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_SNAPPING"), UIThreading.SnappingKey);
+            currentY += snappingKeyMapping.Panel.height + Margin;
+
+            // Lock forestry hotkey control.
+            OptionsKeymapping forestryKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_FORESTRY"), UIThreading.ForestryKey);
+            currentY += forestryKeyMapping.Panel.height + Margin;
+
             // Raise elevation key control.
-            OptionsKeymapping elevationUpMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
-            elevationUpMapping.Label = Translations.Translate("KEY_ELEVATION_UP");
-            elevationUpMapping.Binding = UIThreading.ElevationUpKey;
-            elevationUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            OptionsKeymapping elevationUpMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_ELEVATION_UP"), UIThreading.ElevationUpKey);
             currentY += elevationUpMapping.Panel.height + Margin;
 
             // Lower elevation key control.
-            OptionsKeymapping elevationDownMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
-            elevationDownMapping.Label = Translations.Translate("KEY_ELEVATION_DOWN");
-            elevationDownMapping.Binding = UIThreading.ElevationDownKey;
-            elevationDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            OptionsKeymapping elevationDownMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_ELEVATION_DOWN"), UIThreading.ElevationDownKey);
             currentY += elevationDownMapping.Panel.height + Margin;
 
             // Upscaling key control.
-            OptionsKeymapping scaleUpMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
-            scaleUpMapping.Label = Translations.Translate("KEY_SCALE_UP");
-            scaleUpMapping.Binding = UIThreading.ScaleUpKey;
-            scaleUpMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            OptionsKeymapping scaleUpMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_SCALE_UP"), UIThreading.ScaleUpKey);
             currentY += scaleUpMapping.Panel.height + Margin;
 
             // Downscaling key control.
-            OptionsKeymapping scaleDownMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
-            scaleDownMapping.Label = Translations.Translate("KEY_SCALE_DOWN");
-            scaleDownMapping.Binding = UIThreading.ScaleDownKey;
-            scaleDownMapping.Panel.relativePosition = new Vector2(LeftMargin, currentY);
+            OptionsKeymapping scaleDownMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_SCALE_DOWN"), UIThreading.ScaleDownKey);
             currentY += scaleDownMapping.Panel.height + 20f;
 
+            // Key repeat delay slider.
             UISlider keyDelaySlider = UISliders.AddPlainSliderWithValue(panel, LeftMargin, currentY, Translations.Translate("REPEAT_DELAY"), 0.1f, 1.0f, 0.05f, UIThreading.KeyRepeatDelay);
             keyDelaySlider.eventValueChanged += (c, value) => UIThreading.KeyRepeatDelay = value;
         }

@@ -96,10 +96,10 @@ namespace TreeControl
             currentY += keepAboveGroundCheck.height;
 
             // Lock forestry check.
-            UICheckBox lockForestryCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LOCK_FORESTRY"));
-            lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_TIP");
-            lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestry;
-            lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestry = isChecked; };
+            UICheckBox lockForestryCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("LOCK_FORESTRY_DEFAULT"));
+            lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_DEFAULT_TIP");
+            lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestryDefault;
+            lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestryDefault = isChecked; };
             currentY += lockForestryCheck.height + Margin;
 
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(panel, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);

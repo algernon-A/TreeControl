@@ -5,6 +5,7 @@
 
 namespace TreeControl.Patches
 {
+    using AlgernonCommons.UI;
     using HarmonyLib;
 
     /// <summary>
@@ -13,10 +14,29 @@ namespace TreeControl.Patches
     [HarmonyPatch(typeof(NaturalResourceManager))]
     internal static class NaturalResourceManagerPatches
     {
+        // Lock forestry status.
+        private static bool s_lockForestry = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether forestry resources should be locked.
         /// </summary>
-        internal static bool LockForestry { get; set; } = false;
+        internal static bool LockForestry
+        {
+            get => s_lockForestry;
+
+            set
+            {
+                s_lockForestry = value;
+
+                // Update status panel.
+                StandalonePanelManager<StatusPanel>.Panel?.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether lock forestry should automatically be enabled on load.
+        /// </summary>
+        internal static bool LockForestryDefault { get; set; } = false;
 
         /// <summary>
         /// Harmony prefix to NaturalResourceManager.TreesModified to implement forestry resource locking.

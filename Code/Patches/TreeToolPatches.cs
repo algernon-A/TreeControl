@@ -9,6 +9,7 @@ namespace TreeControl.Patches
     using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
+    using AlgernonCommons.UI;
     using ColossalFramework;
     using HarmonyLib;
     using TreeControl.MoveItSupport;
@@ -32,6 +33,9 @@ namespace TreeControl.Patches
         /// </summary>
         internal const int MinScalingFactor = 5;
 
+        // Snapping status.
+        private static bool s_snappingEnabled = false;
+
         // Tree scaling factor.
         private static byte s_scaling = TreeInstancePatches.DefaultScale;
 
@@ -40,6 +44,22 @@ namespace TreeControl.Patches
 
         // Move It patches and integration.
         private static MoveItPatches s_moveItPatches;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether tree snapping is enabled.
+        /// </summary>
+        internal static bool SnappingEnabled
+        {
+            get => s_snappingEnabled;
+
+            set
+            {
+                s_snappingEnabled = value;
+
+                // Update status panel.
+                StandalonePanelManager<StatusPanel>.Panel?.Refresh();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the current tree scaling factor.
@@ -191,12 +211,8 @@ namespace TreeControl.Patches
         /// <param name="raycast">Raycast to fix.</param>
         private static void TreeSnappingRaycast(ref RaycastInput raycast)
         {
-            raycast.m_ignoreBuildingFlags = Building.Flags.None;
-            raycast.m_ignoreNodeFlags = NetNode.Flags.None;
-            raycast.m_ignoreSegmentFlags = NetSegment.Flags.None;
-            raycast.m_buildingService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
-            raycast.m_netService = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
-            raycast.m_netService2 = new RaycastService(ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default);
+            // Building snapping.
+            raycast.m_ignoreBuildingFlags = SnappingEnabled ? Building.Flags.None : Building.Flags.All;
         }
 
         /// <summary>

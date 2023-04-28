@@ -66,10 +66,10 @@ namespace TreeControl
         public bool KeepAboveGround { get => TreeInstancePatches.KeepAboveGround; set => TreeInstancePatches.KeepAboveGround = value; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether forestry resources should be locked.
+        /// Gets or sets a value indicating whether lock forestry should automatically be enabled on load.
         /// </summary>
         [XmlElement("LockForestry")]
-        public bool LockForestry { get => NaturalResourceManagerPatches.LockForestry; set => NaturalResourceManagerPatches.LockForestry = value; }
+        public bool LockForestryDefault { get => NaturalResourceManagerPatches.LockForestryDefault; set => NaturalResourceManagerPatches.LockForestryDefault = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether any Tree Anarchy mod data should be ignored.
@@ -82,6 +82,18 @@ namespace TreeControl
         /// </summary>
         [XmlElement("AnarchyKey")]
         public Keybinding AnarchyKey { get => UIThreading.AnarchyKey; set => UIThreading.AnarchyKey = value; }
+
+        /// <summary>
+        /// Gets or sets the tree anarchy hotkey.
+        /// </summary>
+        [XmlElement("SnappingKey")]
+        public Keybinding SnappingKey { get => UIThreading.SnappingKey; set => UIThreading.SnappingKey = value; }
+
+        /// <summary>
+        /// Gets or sets the tree anarchy hotkey.
+        /// </summary>
+        [XmlElement("LockForestryKey")]
+        public Keybinding ForestryKey { get => UIThreading.ForestryKey; set => UIThreading.ForestryKey = value; }
 
         /// <summary>
         /// Gets or sets the tree upscaling key.

@@ -7,6 +7,7 @@ namespace TreeControl
 {
     using System.Collections.Generic;
     using AlgernonCommons.Patching;
+    using AlgernonCommons.UI;
     using ICities;
     using TreeControl.Patches;
 
@@ -19,6 +20,19 @@ namespace TreeControl
         /// Gets a list of permitted loading modes.
         /// </summary>
         protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor };
+
+        /// <summary>
+        /// Performs any actions upon successful creation of the mod.
+        /// E.g. Can be used to patch any other mods.
+        /// </summary>
+        /// <param name="loading">Loading mode (e.g. game or editor).</param>
+        protected override void CreatedActions(ILoading loading)
+        {
+            base.CreatedActions(loading);
+
+            // Set intial status.
+            NaturalResourceManagerPatches.LockForestry = NaturalResourceManagerPatches.LockForestryDefault;
+        }
 
         /// <summary>
         /// Performs any actions upon successful level loading completion.
@@ -36,6 +50,9 @@ namespace TreeControl
 
             // Peform end-of-load actions.
             TreeInstancePatches.FinishLoading();
+
+            // Add status panel.
+            StandalonePanelManager<StatusPanel>.Create();
 
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();

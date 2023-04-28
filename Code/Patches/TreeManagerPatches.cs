@@ -9,6 +9,7 @@ namespace TreeControl.Patches
     using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
+    using AlgernonCommons.UI;
     using ColossalFramework;
     using HarmonyLib;
     using static TreeManager;
@@ -20,10 +21,24 @@ namespace TreeControl.Patches
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     internal static class TreeManagerPatches
     {
+        // Anarchy status.
+        private static bool s_anarchyEnabled = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
         /// </summary>
-        internal static bool AnarchyEnabled { get; set; } = false;
+        internal static bool AnarchyEnabled
+        {
+            get => s_anarchyEnabled;
+
+            set
+            {
+                s_anarchyEnabled = value;
+
+                // Update status panel.
+                StandalonePanelManager<StatusPanel>.Panel?.Refresh();
+            }
+        }
 
         /// <summary>
         /// Harmony transpiler for TreeManager.CheckLimits to implement expanded tree limits.
