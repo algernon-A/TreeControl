@@ -21,6 +21,9 @@ namespace TreeControl
         // Layout constants.
         private const float ButtonSize = 36f;
 
+        // Transparency status.
+        private static bool s_transparentUI = false;
+
         // Panel components.
         private UIMultiStateButton _anarchyButton;
         private UIMultiStateButton _snappingButton;
@@ -28,6 +31,31 @@ namespace TreeControl
 
         // Event handling.
         private bool _ignoreEvents = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the status panel should use transparent buttons.
+        /// </summary>
+        public static bool TransparentUI
+        {
+            get => s_transparentUI;
+
+            set
+            {
+                // Don't do anything if no change.
+                if (value != s_transparentUI)
+                {
+
+                    s_transparentUI = value;
+
+                    // Regnerate status panel if open.
+                    if (StandalonePanelManager<StatusPanel>.Panel is StatusPanel panel)
+                    {
+                        panel.Close();
+                        StandalonePanelManager<StatusPanel>.Create();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the panel width.
@@ -173,12 +201,19 @@ namespace TreeControl
 
             // State 0 background.
             UIMultiStateButton.SpriteSet bgSpriteSetZero = bgSpriteSetState[0];
-
-            bgSpriteSetZero.normal = "OptionBase";
-            bgSpriteSetZero.focused = "OptionBase";
-            bgSpriteSetZero.hovered = "OptionBaseHovered";
-            bgSpriteSetZero.pressed = "OptionBasePressed";
-            bgSpriteSetZero.disabled = "OptionBase";
+            if (s_transparentUI)
+            {
+                bgSpriteSetZero.hovered = "TransparentBaseHovered";
+                bgSpriteSetZero.pressed = "TransparentBaseFocused";
+            }
+            else
+            {
+                bgSpriteSetZero.normal = "OptionBase";
+                bgSpriteSetZero.focused = "OptionBase";
+                bgSpriteSetZero.hovered = "OptionBaseHovered";
+                bgSpriteSetZero.pressed = "OptionBasePressed";
+                bgSpriteSetZero.disabled = "OptionBase";
+            }
 
             // State 0 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetZero = fgSpriteSetState[0];
@@ -194,12 +229,20 @@ namespace TreeControl
 
             // State 1 background.
             UIMultiStateButton.SpriteSet bgSpriteSetOne = bgSpriteSetState[1];
-
-            bgSpriteSetOne.normal = "OptionBaseFocused";
-            bgSpriteSetOne.focused = "OptionBaseFocused";
-            bgSpriteSetOne.hovered = "OptionBaseHovered";
-            bgSpriteSetOne.pressed = "OptionBasePressed";
-            bgSpriteSetOne.disabled = "OptionBase";
+            if (s_transparentUI)
+            {
+                bgSpriteSetOne.normal = "TransparentBaseFocused";
+                bgSpriteSetOne.focused = "TransparentBaseFocused";
+                bgSpriteSetOne.hovered = "TransparentBaseHovered";
+            }
+            else
+            {
+                bgSpriteSetOne.normal = "OptionBaseFocused";
+                bgSpriteSetOne.focused = "OptionBaseFocused";
+                bgSpriteSetOne.hovered = "OptionBaseHovered";
+                bgSpriteSetOne.pressed = "OptionBasePressed";
+                bgSpriteSetOne.disabled = "OptionBase";
+            }
 
             // State 1 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetOne = fgSpriteSetState[1];

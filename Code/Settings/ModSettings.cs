@@ -24,6 +24,12 @@ namespace TreeControl
         private static readonly string SettingsFileName = Path.Combine(ColossalFramework.IO.DataLocation.localApplicationData, "TreeControl.xml");
 
         /// <summary>
+        /// Gets or sets a value indicating whether the status panel should use transparent buttons.
+        /// </summary>
+        [XmlElement("TransparentButtons")]
+        public bool UseTransparentButtons { get => StatusPanel.TransparentUI; set => StatusPanel.TransparentUI = value; }
+
+        /// <summary>
         /// Gets or sets the currently active default custom tree limit.
         /// </summary>
         [XmlElement("TreeLimit")]

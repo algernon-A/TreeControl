@@ -20,7 +20,6 @@ namespace TreeControl
         // Layout constants.
         private const float Margin = 5f;
         private const float LeftMargin = 24f;
-        private const float GroupMargin = 40f;
         private const float TitleMargin = 50f;
         private const float MenuX = LeftMargin + 300f;
 
@@ -39,10 +38,14 @@ namespace TreeControl
             UIPanel panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("OPTIONS_GENERAL"), tabIndex, out UIButton _, autoLayout: false);
 
             // Y position indicator.
-            float currentY = GroupMargin;
+            float currentY = LeftMargin;
 
             // Header.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
+
+            // Loading options.
+            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("UI_OPTIONS"));
+            currentY += TitleMargin;
 
             // Language choice.
             UIDropDown languageDropDown = UIDropDowns.AddPlainDropDown(panel, LeftMargin, currentY, Translations.Translate("LANGUAGE_CHOICE"), Translations.LanguageList, Translations.Index);
@@ -54,6 +57,16 @@ namespace TreeControl
             languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += languageDropDown.parent.height + Margin;
 
+            // UI transparency checkbox.
+            UICheckBox transparencyCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("TRANSPARENT_UI"));
+            transparencyCheck.isChecked = StatusPanel.TransparentUI;
+            transparencyCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.TransparentUI = isChecked; };
+            currentY += transparencyCheck.height + Margin;
+
+            // Loading options.
+            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("LOAD_OPTIONS"));
+            currentY += TitleMargin;
+
             string[] loadOptions = new string[]
             {
                 Translations.Translate("LEAVE"),
@@ -61,10 +74,6 @@ namespace TreeControl
                 Translations.Translate("UNHIDE"),
                 Translations.Translate("DELETE"),
             };
-
-            // Loading options.
-            UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("LOAD_OPTIONS"));
-            currentY += TitleMargin;
 
             // Network hiding options.
             _networkDropDown = OverlapDropdown(panel, currentY, "NETWORK_OVERLAP", loadOptions);
