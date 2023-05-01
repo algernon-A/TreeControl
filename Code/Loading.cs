@@ -42,9 +42,6 @@ namespace TreeControl
         {
             base.LoadedActions(mode);
 
-            // Activate display label.
-            StatusLabel.CreateLabel();
-
             // Assign tree LOD resolution.
             TreeLODControl.SetLODResolution();
 

@@ -5,8 +5,10 @@
 
 namespace TreeControl
 {
+    using System.Text;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
+    using ColossalFramework;
     using ColossalFramework.UI;
     using TreeControl.Patches;
     using UnityEngine;
@@ -17,7 +19,7 @@ namespace TreeControl
     internal class StatusPanel : StandalonePanelBase
     {
         // Layout constants.
-        private const float ButtonSize = 40f;
+        private const float ButtonSize = 36f;
 
         // Panel components.
         private UIMultiStateButton _anarchyButton;
@@ -60,8 +62,20 @@ namespace TreeControl
             // Options panel toggles.
             UITextureAtlas tcAtlas = UITextures.CreateSpriteAtlas("TreeControl", 1024, string.Empty);
 
+            _snappingButton = AddToggleButton(this, "Tree snapping status", tcAtlas, "SnappingOff", "SnappingOn");
+            _snappingButton.tooltipBox = UIToolTips.WordWrapToolTip;
+            _snappingButton.relativePosition = Vector2.zero;
+            _snappingButton.eventActiveStateIndexChanged += (c, state) =>
+            {
+                // Don't do anything if ignoring events.
+                if (!_ignoreEvents)
+                {
+                    TreeToolPatches.SnappingEnabled = state != 0;
+                }
+            };
+
             _anarchyButton = AddToggleButton(this, "Tree anarchy status", tcAtlas, "AnarchyOff", "AnarchyOn");
-            _anarchyButton.relativePosition = Vector2.zero;
+            _anarchyButton.relativePosition = new Vector2(ButtonSize + Margin, 0f);
             _anarchyButton.tooltipBox = UIToolTips.WordWrapToolTip;
             _anarchyButton.eventActiveStateIndexChanged += (c, state) =>
             {
@@ -69,18 +83,6 @@ namespace TreeControl
                 if (!_ignoreEvents)
                 {
                     TreeManagerPatches.AnarchyEnabled = state != 0;
-                }
-            };
-
-            _snappingButton = AddToggleButton(this, "Tree snapping status", tcAtlas, "SnappingOff", "SnappingOn");
-            _snappingButton.tooltipBox = UIToolTips.WordWrapToolTip;
-            _snappingButton.relativePosition = new Vector2(ButtonSize + Margin, 0f);
-            _snappingButton.eventActiveStateIndexChanged += (c, state) =>
-            {
-                // Don't do anything if ignoring events.
-                if (!_ignoreEvents)
-                {
-                    TreeToolPatches.SnappingEnabled = state != 0;
                 }
             };
 
@@ -107,15 +109,36 @@ namespace TreeControl
         {
             // Suppress events while changing state.
             _ignoreEvents = true;
-            _anarchyButton.activeStateIndex = TreeManagerPatches.AnarchyEnabled ? 1 : 0;
             _snappingButton.activeStateIndex = TreeToolPatches.SnappingEnabled ? 1 : 0;
+            _anarchyButton.activeStateIndex = TreeManagerPatches.AnarchyEnabled ? 1 : 0;
             _lockForestryButton.activeStateIndex = NaturalResourceManagerPatches.LockForestry ? 1 : 0;
             _ignoreEvents = false;
 
+            StringBuilder tooltipText = new StringBuilder();
+
             // Set button tooltips.
-            _anarchyButton.tooltip = Translations.Translate("ANARCHY_STATUS") + ' ' + Translations.Translate(TreeManagerPatches.AnarchyEnabled ? "ON" : "OFF") + System.Environment.NewLine + Translations.Translate("ANARCHY_TIP");
-            _snappingButton.tooltip = Translations.Translate("SNAPPING_STATUS") + ' ' + Translations.Translate(TreeToolPatches.SnappingEnabled ? "ON" : "OFF") + System.Environment.NewLine + Translations.Translate("SNAPPING_TIP");
-            _lockForestryButton.tooltip = Translations.Translate("FORESTRY_STATUS") + ' ' + Translations.Translate(NaturalResourceManagerPatches.LockForestry ? "ON" : "OFF") + System.Environment.NewLine + Translations.Translate("FORESTRY_TIP");
+            tooltipText.Append(Translations.Translate("SNAPPING_STATUS"));
+            tooltipText.Append(' ');
+            tooltipText.AppendLine(TreeToolPatches.SnappingEnabled ? "ON" : "OFF");
+            tooltipText.AppendLine(Translations.Translate("SNAPPING_TIP"));
+            tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.SnappingKey.Encode()));
+            _snappingButton.tooltip = tooltipText.ToString();
+
+            tooltipText.Length = 0;
+            tooltipText.Append(Translations.Translate("ANARCHY_STATUS"));
+            tooltipText.Append(' ');
+            tooltipText.AppendLine(TreeManagerPatches.AnarchyEnabled ? "ON" : "OFF");
+            tooltipText.AppendLine(Translations.Translate("ANARCHY_TIP"));
+            tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.AnarchyKey.Encode()));
+            _anarchyButton.tooltip = tooltipText.ToString();
+
+            tooltipText.Length = 0;
+            tooltipText.Append(Translations.Translate("FORESTRY_STATUS"));
+            tooltipText.Append(' ');
+            tooltipText.AppendLine(NaturalResourceManagerPatches.LockForestry ? "ON" : "OFF");
+            tooltipText.AppendLine(Translations.Translate("FORESTRY_TIP"));
+            tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.ForestryKey.Encode()));
+            _lockForestryButton.tooltip = tooltipText.ToString();
         }
 
         /// <summary>
@@ -151,11 +174,11 @@ namespace TreeControl
             // State 0 background.
             UIMultiStateButton.SpriteSet bgSpriteSetZero = bgSpriteSetState[0];
 
-            bgSpriteSetZero.normal = "IconPolicyBaseCircle";
-            bgSpriteSetZero.focused = "IconPolicyBaseCircle";
-            bgSpriteSetZero.hovered = "IconPolicyBaseCircleHovered";
-            bgSpriteSetZero.pressed = "IconPolicyBaseCirclePressed";
-            bgSpriteSetZero.disabled = "IconPolicyBaseCircleDisabled";
+            bgSpriteSetZero.normal = "OptionBase";
+            bgSpriteSetZero.focused = "OptionBase";
+            bgSpriteSetZero.hovered = "OptionBaseHovered";
+            bgSpriteSetZero.pressed = "OptionBasePressed";
+            bgSpriteSetZero.disabled = "OptionBase";
 
             // State 0 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetZero = fgSpriteSetState[0];
@@ -172,11 +195,11 @@ namespace TreeControl
             // State 1 background.
             UIMultiStateButton.SpriteSet bgSpriteSetOne = bgSpriteSetState[1];
 
-            bgSpriteSetOne.normal = "IconPolicyBaseCircleFocused";
-            bgSpriteSetOne.focused = "IconPolicyBaseCircleFocused";
-            bgSpriteSetOne.hovered = "IconPolicyBaseCircleFocused";
-            bgSpriteSetOne.pressed = "IconPolicyBaseCirclePressed";
-            bgSpriteSetOne.disabled = "IconPolicyBaseCircleDisabled";
+            bgSpriteSetOne.normal = "OptionBaseFocused";
+            bgSpriteSetOne.focused = "OptionBaseFocused";
+            bgSpriteSetOne.hovered = "OptionBaseHovered";
+            bgSpriteSetOne.pressed = "OptionBasePressed";
+            bgSpriteSetOne.disabled = "OptionBase";
 
             // State 1 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetOne = fgSpriteSetState[1];
