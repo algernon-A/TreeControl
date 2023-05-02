@@ -12,7 +12,7 @@
 "KEYS","Keys","Options tab title."
 "OPTIONS_LIMIT","More trees","Options tab title."
 "UI_OPTIONS","User interface","Options panel header."
-"TRANSPARENT_UI","Use transparent buttons","Checkbox in options panel."
+"TRANSPARENT_UI","Use transparent button backgrounds","Checkbox in options panel."
 "LOAD_OPTIONS","Loading actions","Options panel header."
 "NETWORK_OVERLAP","Trees under networks","Options panel menu title."
 "BUILDING_OVERLAP","Trees under buildings","Options panel menu title."

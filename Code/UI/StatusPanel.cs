@@ -44,7 +44,6 @@ namespace TreeControl
                 // Don't do anything if no change.
                 if (value != s_transparentUI)
                 {
-
                     s_transparentUI = value;
 
                     // Regnerate status panel if open.
@@ -149,6 +148,8 @@ namespace TreeControl
             tooltipText.Append(' ');
             tooltipText.AppendLine(TreeToolPatches.SnappingEnabled ? "ON" : "OFF");
             tooltipText.AppendLine(Translations.Translate("SNAPPING_TIP"));
+            tooltipText.Append(Translations.Translate("KEY_SNAPPING"));
+            tooltipText.Append(Translations.Translate(": "));
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.SnappingKey.Encode()));
             _snappingButton.tooltip = tooltipText.ToString();
 
@@ -157,6 +158,8 @@ namespace TreeControl
             tooltipText.Append(' ');
             tooltipText.AppendLine(TreeManagerPatches.AnarchyEnabled ? "ON" : "OFF");
             tooltipText.AppendLine(Translations.Translate("ANARCHY_TIP"));
+            tooltipText.Append(Translations.Translate("KEY_ANARCHY"));
+            tooltipText.Append(Translations.Translate(": "));
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.AnarchyKey.Encode()));
             _anarchyButton.tooltip = tooltipText.ToString();
 
@@ -165,6 +168,8 @@ namespace TreeControl
             tooltipText.Append(' ');
             tooltipText.AppendLine(NaturalResourceManagerPatches.LockForestry ? "ON" : "OFF");
             tooltipText.AppendLine(Translations.Translate("FORESTRY_TIP"));
+            tooltipText.Append(Translations.Translate("KEY_FORESTRY"));
+            tooltipText.Append(Translations.Translate(": "));
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.ForestryKey.Encode()));
             _lockForestryButton.tooltip = tooltipText.ToString();
         }
