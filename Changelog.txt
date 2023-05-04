@@ -1,7 +1,9 @@
 Version 0.9.6 -
 
 - Implement icon status panel
+- Added hotkeys to toggle snapping and lock forestry
 - Apply fixed height flag to all trees deserialized from old Tree Snapping mod
+
 
 Version 0.9.5 -
 
