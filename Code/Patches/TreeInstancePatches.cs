@@ -737,8 +737,8 @@ namespace TreeControl.Patches
         /// <returns>Calculated tree Y coordinate per current settings.</returns>
         private static ushort CalculateElevation(ushort terrainY, ushort treeY, ref TreeInstance instance)
         {
-            // If "update on terrain" is selected and we've loaded, or if the tree isn't fixed height.
-            if ((s_updateOnTerrain & s_terrainReady) | (instance.m_flags & (ushort)TreeInstance.Flags.FixedHeight) == 0)
+            // If "update on terrain" is selected and we've loaded ad the terrain tool is selected., or if the tree isn't fixed height.
+            if ((s_updateOnTerrain & s_terrainReady && Singleton<ToolController>.instance.CurrentTool is TerrainTool) | (instance.m_flags & (ushort)TreeInstance.Flags.FixedHeight) == 0)
             {
                 // Default game behaviour - terrain height.
                 return terrainY;

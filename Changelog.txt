@@ -1,3 +1,6 @@
+- Only reset trees to terrain height when the terrain tool is in use
+
+
 Version 0.9.6 -
 
 - Implement icon status panel
