@@ -1,3 +1,7 @@
+- Remember status panel position between loads
+- Add 'reset position' button to options panel
+
+
 Version 0.9.6.1 -
 
 - Only reset trees to terrain height when the terrain tool is in use

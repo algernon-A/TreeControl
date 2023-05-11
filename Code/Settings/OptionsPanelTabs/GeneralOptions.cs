@@ -38,12 +38,12 @@ namespace TreeControl
             UIPanel panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("OPTIONS_GENERAL"), tabIndex, out UIButton _, autoLayout: false);
 
             // Y position indicator.
-            float currentY = LeftMargin;
+            float currentY = 0f;
 
             // Header.
             float headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
 
-            // Loading options.
+            // UI options.
             UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("UI_OPTIONS"));
             currentY += TitleMargin;
 
@@ -62,6 +62,10 @@ namespace TreeControl
             transparencyCheck.isChecked = StatusPanel.TransparentUI;
             transparencyCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.TransparentUI = isChecked; };
             currentY += transparencyCheck.height + Margin;
+
+            UIButton resetPositionButton = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("RESET_POS"), 300f);
+            resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<StatusPanel>.ResetPosition();
+            currentY += resetPositionButton.height + 15f;
 
             // Loading options.
             UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("LOAD_OPTIONS"));
@@ -113,7 +117,7 @@ namespace TreeControl
 
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(panel, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
-            currentY += swayFactorSlider.parent.height + Margin;
+            currentY += swayFactorSlider.parent.height;
 
             // Tree LOD detail.
             string[] lodDetailLevels = new string[(int)TreeLODControl.Resolution.NumResolutions]
@@ -126,7 +130,7 @@ namespace TreeControl
                 };
             UIDropDown lodDropDown = UIDropDowns.AddPlainDropDown(panel, LeftMargin, currentY, Translations.Translate("LOD_DETAIL"), lodDetailLevels, (int)TreeLODControl.CurrentResolution, 350f);
             lodDropDown.eventSelectedIndexChanged += (c, index) => TreeLODControl.CurrentResolution = (TreeLODControl.Resolution)index;
-            currentY += lodDropDown.parent.height + 20f;
+            currentY += lodDropDown.parent.height + 10f;
 
             // Troubleshooting options.
             UISpacers.AddTitleSpacer(panel, Margin, currentY, headerWidth, Translations.Translate("TROUBLESHOOTING"));

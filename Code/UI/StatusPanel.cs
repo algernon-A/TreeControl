@@ -133,6 +133,16 @@ namespace TreeControl
         }
 
         /// <summary>
+        /// Applies the panel's default position.
+        /// </summary>
+        public override void ApplyDefaultPosition()
+        {
+            // Set position.
+            UIComponent optionsBar = GameObject.Find("OptionsBar").GetComponent<UIComponent>();
+            absolutePosition = optionsBar.absolutePosition - new Vector3(PanelWidth + Margin, 0f);
+        }
+
+        /// <summary>
         /// Refreshes button states.
         /// </summary>
         internal void Refresh()
@@ -175,16 +185,6 @@ namespace TreeControl
             tooltipText.Append(": ");
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.ForestryKey.Encode()));
             _lockForestryButton.tooltip = tooltipText.ToString();
-        }
-
-        /// <summary>
-        /// Gets the panel's default position.
-        /// </summary>
-        protected override void ApplyDefaultPosition()
-        {
-            // Set position.
-            UIComponent optionsBar = GameObject.Find("OptionsBar").GetComponent<UIComponent>();
-            absolutePosition = optionsBar.absolutePosition - new Vector3(PanelWidth + Margin, 0f);
         }
 
         /// <summary>
