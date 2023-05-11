@@ -22,8 +22,8 @@ namespace TreeControl
 
             // Add tabs and panels.
             new GeneralOptions(tabStrip, 0);
-            new KeyOptions(tabStrip, 1);
-            new MoreTreesOptions(tabStrip, 2);
+            new TreeOptions(tabStrip, 1);
+            new KeyOptions(tabStrip, 2);
 
             // Select first tab.
             tabStrip.selectedIndex = -1;

@@ -1,5 +1,6 @@
 - Remember status panel position between loads
 - Add 'reset position' button to options panel
+- Reorganize options panel tabs
 
 
 Version 0.9.6.1 -
