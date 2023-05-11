@@ -20,6 +20,7 @@ namespace TreeControl
     {
         // Layout constants.
         private const float ButtonSize = 36f;
+        private const float ButtonSpacing = 2f;
 
         // Panel settings.
         private static bool s_showButtons = true;
@@ -29,6 +30,10 @@ namespace TreeControl
         private UIMultiStateButton _anarchyButton;
         private UIMultiStateButton _snappingButton;
         private UIMultiStateButton _lockForestryButton;
+
+        // Dragging.
+        private bool _dragging = false;
+        private Vector3 _lastDragPosition;
 
         // Event handling.
         private bool _ignoreEvents = false;
@@ -91,7 +96,7 @@ namespace TreeControl
         /// <summary>
         /// Gets the panel width.
         /// </summary>
-        public override float PanelWidth => (ButtonSize * 3f) + (Margin * 2f);
+        public override float PanelWidth => (ButtonSize * 3f) + (ButtonSpacing * 2f);
 
         /// <summary>
         /// Gets the panel height.
@@ -105,21 +110,6 @@ namespace TreeControl
         public override void Start()
         {
             base.Start();
-
-            // Draghandle.
-            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-            dragHandle.relativePosition = Vector2.zero;
-            dragHandle.width = PanelWidth;
-            dragHandle.height = PanelHeight;
-            dragHandle.target = this;
-
-            // Remember position.
-            dragHandle.eventMouseUp += (c, p) =>
-            {
-                StandalonePanelManager<StatusPanel>.LastSavedXPosition = absolutePosition.x;
-                StandalonePanelManager<StatusPanel>.LastSavedYPosition = absolutePosition.y;
-                ModSettings.Save();
-            };
 
             // Options panel toggles.
             UITextureAtlas tcAtlas = UITextures.CreateSpriteAtlas("TreeControl", 1024, string.Empty);
@@ -137,7 +127,7 @@ namespace TreeControl
             };
 
             _anarchyButton = AddToggleButton(this, "Tree anarchy status", tcAtlas, "AnarchyOff", "AnarchyOn");
-            _anarchyButton.relativePosition = new Vector2(ButtonSize + Margin, 0f);
+            _anarchyButton.relativePosition = new Vector2(ButtonSize + ButtonSpacing, 0f);
             _anarchyButton.tooltipBox = UIToolTips.WordWrapToolTip;
             _anarchyButton.eventActiveStateIndexChanged += (c, state) =>
             {
@@ -150,7 +140,7 @@ namespace TreeControl
 
             _lockForestryButton = AddToggleButton(this, "Tree snapping status", tcAtlas, "LockForestOff", "LockForestOn");
             _lockForestryButton.tooltipBox = UIToolTips.WordWrapToolTip;
-            _lockForestryButton.relativePosition = new Vector2((ButtonSize + Margin) * 2f, 0f);
+            _lockForestryButton.relativePosition = new Vector2((ButtonSize + ButtonSpacing) * 2f, 0f);
             _lockForestryButton.eventActiveStateIndexChanged += (c, state) =>
             {
                 // Don't do anything if ignoring events.
@@ -159,6 +149,11 @@ namespace TreeControl
                     NaturalResourceManagerPatches.LockForestry = state != 0;
                 }
             };
+
+            // Enable right-click dragging.
+            _snappingButton.eventMouseMove += Drag;
+            _anarchyButton.eventMouseMove += Drag;
+            _lockForestryButton.eventMouseMove += Drag;
 
             // Set intial button states.
             Refresh();
@@ -217,6 +212,86 @@ namespace TreeControl
             tooltipText.Append(": ");
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.ForestryKey.Encode()));
             _lockForestryButton.tooltip = tooltipText.ToString();
+        }
+
+        /// <summary>
+        /// Drags the panel when the right mouse button is held down.
+        /// </summary>
+        /// <param name="c">Calling component (ignored).</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void Drag(UIComponent c, UIMouseEventParameter p)
+        {
+            p.Use();
+
+            // Check for right button press.
+            if ((p.buttons & UIMouseButton.Right) != 0)
+            {
+                // Peform dragging actions if already dragging.
+                if (_dragging)
+                {
+                    // Calculate correct position by raycast - this is from game's UIDragHandle.
+                    // Raw mouse position doesn't align with the game's UI scaling.
+                    Ray ray = p.ray;
+                    Vector3 inNormal = GetUIView().uiCamera.transform.TransformDirection(Vector3.back);
+                    new Plane(inNormal, _lastDragPosition).Raycast(ray, out float enter);
+                    Vector3 currentPosition = (ray.origin + (ray.direction * enter)).Quantize(PixelsToUnits());
+                    Vector3 vectorDelta = currentPosition - _lastDragPosition;
+                    Vector3[] corners = GetUIView().GetCorners();
+                    Vector3 newTransformPosition = (transform.position + vectorDelta).Quantize(PixelsToUnits());
+
+                    // Calculate panel bounds for screen constraint.
+                    Vector3 upperLeft = pivot.TransformToUpperLeft(size, arbitraryPivotOffset);
+                    Vector3 bottomRight = upperLeft + new Vector3(size.x, 0f - size.y);
+                    upperLeft *= PixelsToUnits();
+                    bottomRight *= PixelsToUnits();
+
+                    // Constrain to screen.
+                    if (newTransformPosition.x + upperLeft.x < corners[0].x)
+                    {
+                        newTransformPosition.x = corners[0].x - upperLeft.x;
+                    }
+
+                    if (newTransformPosition.x + bottomRight.x > corners[1].x)
+                    {
+                        newTransformPosition.x = corners[1].x - bottomRight.x;
+                    }
+
+                    if (newTransformPosition.y + upperLeft.y > corners[0].y)
+                    {
+                        newTransformPosition.y = corners[0].y - upperLeft.y;
+                    }
+
+                    if (newTransformPosition.y + bottomRight.y < corners[2].y)
+                    {
+                        newTransformPosition.y = corners[2].y - bottomRight.y;
+                    }
+
+                    // Apply calculated position.
+                    transform.position = newTransformPosition;
+                    _lastDragPosition = currentPosition;
+                }
+                else
+                {
+                    // Not already dragging, but dragging has started - commence.
+                    _dragging = true;
+
+                    // Calculate and record initial position.
+                    Plane plane = new Plane(transform.TransformDirection(Vector3.back), this.transform.position);
+                    Ray ray = p.ray;
+                    plane.Raycast(ray, out float enter);
+                    _lastDragPosition = ray.origin + (ray.direction * enter);
+                }
+            }
+            else if (_dragging)
+            {
+                // We were dragging, but the mouse button is no longer held down - stop dragging.
+                _dragging = false;
+
+                // Record new position.
+                StandalonePanelManager<StatusPanel>.LastSavedXPosition = absolutePosition.x;
+                StandalonePanelManager<StatusPanel>.LastSavedYPosition = absolutePosition.y;
+                ModSettings.Save();
+            }
         }
 
         /// <summary>
