@@ -8,6 +8,7 @@ namespace TreeControl
     using System.IO;
     using System.Xml.Serialization;
     using AlgernonCommons.Keybinding;
+    using AlgernonCommons.UI;
     using AlgernonCommons.XML;
     using TreeControl.Patches;
 
@@ -28,6 +29,18 @@ namespace TreeControl
         /// </summary>
         [XmlElement("TransparentButtons")]
         public bool UseTransparentButtons { get => StatusPanel.TransparentUI; set => StatusPanel.TransparentUI = value; }
+
+        /// <summary>
+        /// Gets or sets the panel's saved X-position.
+        /// </summary>
+        [XmlElement("StatusPanelX")]
+        public float StatusPanelX { get => StandalonePanelManager<StatusPanel>.LastSavedXPosition; set => StandalonePanelManager<StatusPanel>.LastSavedXPosition = value; }
+
+        /// <summary>
+        /// Gets or sets the panel's saved Y-position.
+        /// </summary>
+        [XmlElement("StatusPanelY")]
+        public float StatusPanelY { get => StandalonePanelManager<StatusPanel>.LastSavedYPosition; set => StandalonePanelManager<StatusPanel>.LastSavedYPosition = value; }
 
         /// <summary>
         /// Gets or sets the currently active default custom tree limit.

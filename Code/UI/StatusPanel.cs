@@ -67,11 +67,6 @@ namespace TreeControl
         public override float PanelHeight => ButtonSize;
 
         /// <summary>
-        /// Gets a value indicating whether the panel's previous position should be remembered after closing.
-        /// </summary>
-        public override bool RememberPosition => false;
-
-        /// <summary>
         /// Called by Unity before the first frame.
         /// Used to perform setup.
         /// </summary>
@@ -85,6 +80,14 @@ namespace TreeControl
             dragHandle.width = PanelWidth;
             dragHandle.height = PanelHeight;
             dragHandle.target = this;
+
+            // Remember position.
+            dragHandle.eventMouseUp += (c, p) =>
+            {
+                StandalonePanelManager<StatusPanel>.LastSavedXPosition = absolutePosition.x;
+                StandalonePanelManager<StatusPanel>.LastSavedYPosition = absolutePosition.y;
+                ModSettings.Save();
+            };
 
             // Options panel toggles.
             UITextureAtlas tcAtlas = UITextures.CreateSpriteAtlas("TreeControl", 1024, string.Empty);
