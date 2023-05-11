@@ -49,7 +49,10 @@ namespace TreeControl
             TreeInstancePatches.FinishLoading();
 
             // Add status panel.
-            StandalonePanelManager<StatusPanel>.Create();
+            if (StatusPanel.ShowButtons)
+            {
+                StandalonePanelManager<StatusPanel>.Create();
+            }
 
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();

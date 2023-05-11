@@ -21,7 +21,8 @@ namespace TreeControl
         // Layout constants.
         private const float ButtonSize = 36f;
 
-        // Transparency status.
+        // Panel settings.
+        private static bool s_showButtons = true;
         private static bool s_transparentUI = false;
 
         // Panel components.
@@ -31,6 +32,37 @@ namespace TreeControl
 
         // Event handling.
         private bool _ignoreEvents = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the status panel should be shown.
+        /// </summary>
+        public static bool ShowButtons
+        {
+            get => s_showButtons;
+
+            set
+            {
+                // Don't do anything if no change.
+                if (value != s_showButtons)
+                {
+                    s_showButtons = value;
+
+                    // Showing - create panel if in-game.
+                    if (value)
+                    {
+                        if (Loading.IsLoaded)
+                        {
+                            StandalonePanelManager<StatusPanel>.Create();
+                        }
+                    }
+                    else
+                    {
+                        // Hiding - close status panel if open.
+                        StandalonePanelManager<StatusPanel>.Panel?.Close();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the status panel should use transparent buttons.

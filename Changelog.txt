@@ -1,3 +1,4 @@
+- Add option to hide status panel
 - Remember status panel position between loads
 - Add 'reset position' button to options panel
 - Reorganize options panel tabs

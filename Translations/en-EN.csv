@@ -12,6 +12,7 @@
 "OPTIONS_TREES","Trees","Options tab title."
 "KEYS","Keys","Options tab title."
 "UI_OPTIONS","User interface","Options panel header."
+"SHOW_BUTTONS","Show status buttons","Checkbox in options panel."
 "TRANSPARENT_UI","Use transparent button backgrounds","Checkbox in options panel."
 "RESET_POS","Reset button position","Button in options panel."
 "OPTIONS_LIMIT","More trees","Options panel header."

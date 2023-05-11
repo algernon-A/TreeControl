@@ -52,6 +52,12 @@ namespace TreeControl
             languageDropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += languageDropDown.parent.height + Margin;
 
+            // Show panel checkbox.
+            UICheckBox showButtonCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SHOW_BUTTONS"));
+            showButtonCheck.isChecked = StatusPanel.ShowButtons;
+            showButtonCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.ShowButtons = isChecked; };
+            currentY += showButtonCheck.height + 10f;
+
             // UI transparency checkbox.
             UICheckBox transparencyCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("TRANSPARENT_UI"));
             transparencyCheck.isChecked = StatusPanel.TransparentUI;
