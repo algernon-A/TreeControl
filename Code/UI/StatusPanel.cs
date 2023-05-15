@@ -166,7 +166,7 @@ namespace TreeControl
         {
             // Set position.
             UIComponent optionsBar = GameObject.Find("OptionsBar").GetComponent<UIComponent>();
-            absolutePosition = optionsBar.absolutePosition - new Vector3(PanelWidth + Margin, 0f);
+            absolutePosition = optionsBar.absolutePosition - new Vector3(PanelWidth + Margin + 47f, 0f);
         }
 
         /// <summary>
@@ -181,9 +181,19 @@ namespace TreeControl
             _lockForestryButton.activeStateIndex = NaturalResourceManagerPatches.LockForestry ? 1 : 0;
             _ignoreEvents = false;
 
+            // Set button tooltips.
+            UpdateTooltips();
+        }
+
+        /// <summary>
+        /// Updates button tooltips.
+        /// </summary>
+        internal void UpdateTooltips()
+        {
+            // A lot of string manipluations, so use a StringBuilder.
             StringBuilder tooltipText = new StringBuilder();
 
-            // Set button tooltips.
+            // Snapping button tooltip.
             tooltipText.Append(Translations.Translate("SNAPPING_STATUS"));
             tooltipText.Append(' ');
             tooltipText.AppendLine(TreeToolPatches.SnappingEnabled ? "ON" : "OFF");
@@ -193,6 +203,7 @@ namespace TreeControl
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.SnappingKey.Encode()));
             _snappingButton.tooltip = tooltipText.ToString();
 
+            // Anarchy button tooltip.
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("ANARCHY_STATUS"));
             tooltipText.Append(' ');
@@ -203,6 +214,7 @@ namespace TreeControl
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.AnarchyKey.Encode()));
             _anarchyButton.tooltip = tooltipText.ToString();
 
+            // Lock forestry button tooltip.
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("FORESTRY_STATUS"));
             tooltipText.Append(' ');

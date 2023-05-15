@@ -6,6 +6,7 @@
 namespace TreeControl
 {
     using AlgernonCommons.Keybinding;
+    using AlgernonCommons.UI;
     using ICities;
     using TreeControl.Patches;
     using UnityEngine;
@@ -56,17 +57,49 @@ namespace TreeControl
         /// <summary>
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
-        internal static Keybinding AnarchyKey { get => s_anarchyKey; set => s_anarchyKey = value; }
+        internal static Keybinding AnarchyKey
+        {
+            get => s_anarchyKey;
+
+            set
+            {
+                s_anarchyKey = value;
+
+                // Update button tooltips if status panel exists.
+                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the tree snapping hotkey.
         /// </summary>
-        internal static Keybinding SnappingKey { get => s_snappingKey; set => s_snappingKey = value; }
+        internal static Keybinding SnappingKey
+        {
+            get => s_snappingKey;
+
+            set
+            {
+                s_snappingKey = value;
+
+                // Update button tooltips if status panel exists.
+                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the lock forestry hotkey.
         /// </summary>
-        internal static Keybinding ForestryKey { get => s_forestryKey; set => s_forestryKey = value; }
+        internal static Keybinding ForestryKey
+        {
+            get => s_forestryKey;
+            set
+            {
+                s_forestryKey = value;
+
+                // Update button tooltips if status panel exists.
+                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the tree upscaling key.

@@ -3,6 +3,7 @@
 - Add status panel dragging on button right-click
 - Add 'reset position' button to options panel
 - Reorganize options panel tabs
+- Update status panel tooltips when key bindings change
 
 
 Version 0.9.6.1 -

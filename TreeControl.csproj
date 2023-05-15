@@ -37,7 +37,6 @@
 		<_Translations Include="$(ProjectDir)/Translations/*.csv" />
 		<_TranslationsCore Include="../AlgernonCommons/Translations/*.csv" />
 		<_Resources Include="$(ProjectDir)/Resources/*.*" />
-		<_Libraries Include="$(ProjectDir)/Libraries/*.*" />
 	</ItemGroup>
 	<Target Name="DeployToModDirectory" AfterTargets="Build">
 		<PropertyGroup>
