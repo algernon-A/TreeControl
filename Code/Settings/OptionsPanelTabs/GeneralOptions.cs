@@ -64,6 +64,7 @@ namespace TreeControl
             transparencyCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.TransparentUI = isChecked; };
             currentY += transparencyCheck.height + 10f;
 
+            // Reset position button.
             UIButton resetPositionButton = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("RESET_POS"), 300f);
             resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<StatusPanel>.ResetPosition();
             currentY += resetPositionButton.height + 20f;
