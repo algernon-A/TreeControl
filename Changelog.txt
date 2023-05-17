@@ -1,3 +1,6 @@
+- Implement custom tree info deserializer (should prevent trees changing on load due to info index mismatches)
+
+
 Version 0.9.7 -
 
 - Add option to hide status panel

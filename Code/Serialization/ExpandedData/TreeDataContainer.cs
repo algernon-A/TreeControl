@@ -9,8 +9,12 @@ namespace TreeControl.ExpandedData
     using AlgernonCommons;
     using ColossalFramework;
     using ColossalFramework.IO;
+    using HarmonyLib;
     using TreeControl.Patches;
+    using UnityEngine;
     using static TreeManager;
+    using PrefabData = PrefabCollection<TreeInfo>.PrefabData;
+    using TreeInstance = global::TreeInstance;
 
     /// <summary>
     /// Savegame data container for expanded tree limit data.
@@ -20,6 +24,10 @@ namespace TreeControl.ExpandedData
     {
         // Current data version.
         private const int DataVersion = 0;
+
+        // Prefab index deserialization.
+        private static EncodedArray.UShort m_encodedArray;
+        private static FastList<PrefabData> m_simulationPrefabs;
 
         /// <summary>
         /// Gets or sets the array of instances of expanded tree data.
@@ -116,7 +124,9 @@ namespace TreeControl.ExpandedData
         public void Deserialize(DataSerializer serializer)
         {
             // Read data version.
-            if (serializer.ReadInt32() != DataVersion)
+            int dataVersion = serializer.ReadInt32();
+            Logging.KeyMessage("found extended data version ", dataVersion);
+            if (dataVersion > DataVersion)
             {
                 Logging.Error("invalid data version detected; aborting");
                 return;
@@ -156,16 +166,16 @@ namespace TreeControl.ExpandedData
             flags.EndRead();
 
             // Tree prefab indexes.
-            PrefabCollection<TreeInfo>.BeginDeserialize(serializer);
-            for (int i = MAX_TREE_COUNT; i < savedBufferSize; ++i)
+            BeginDeserializeInfos(serializer);
+            for (int i = dataVersion == 0 ? MAX_TREE_COUNT : MAX_TREE_COUNT; i < savedBufferSize; ++i)
             {
                 if (newTreeBuffer[i].m_flags != 0)
                 {
-                    newTreeBuffer[i].m_infoIndex = (ushort)PrefabCollection<TreeInfo>.Deserialize(important: true);
+                    newTreeBuffer[i].m_infoIndex = DeserializeInfo();
                 }
             }
 
-            PrefabCollection<TreeInfo>.EndDeserialize(serializer);
+            EndDeserializeInfos(serializer);
 
             // X positions.
             EncodedArray.Short xPositions = EncodedArray.Short.BeginRead(serializer);
@@ -241,6 +251,89 @@ namespace TreeControl.ExpandedData
         /// <param name="serializer">Data serializer.</param>
         public void AfterDeserialize(DataSerializer serializer)
         {
+        }
+
+        /// <summary>
+        /// Begins deserialization of tree info indexes.
+        /// </summary>
+        /// <param name="serializer">Data serializer.</param>
+        private void BeginDeserializeInfos(DataSerializer serializer)
+        {
+            // Set read array.
+            m_encodedArray = EncodedArray.UShort.BeginRead(serializer);
+
+            // Get simulationPrefabs fastlist.
+            m_simulationPrefabs = AccessTools.Field(typeof(PrefabCollection<TreeInfo>), "m_simulationPrefabs").GetValue(null) as FastList<PrefabCollection<TreeInfo>.PrefabData>;
+        }
+
+        /// <summary>
+        /// Deserializes a tree info index.
+        /// </summary>
+        /// <returns>Deserialized prefab index.</returns>
+        private ushort DeserializeInfo()
+        {
+            // Read prefab index.
+            uint prefabIndex = m_encodedArray.Read();
+
+            // Check for new index.
+            if ((int)prefabIndex >= m_simulationPrefabs.m_size)
+            {
+                int simPrefabsLength = 0;
+                if (m_simulationPrefabs.m_buffer != null)
+                {
+                    simPrefabsLength = m_simulationPrefabs.m_buffer.Length;
+                }
+
+                // Expand simulation prefab fastlist length if required.
+                if ((int)prefabIndex >= simPrefabsLength)
+                {
+                    int capacity = Mathf.Max(Mathf.Max((int)(prefabIndex + 1), 32), simPrefabsLength << 1);
+                    m_simulationPrefabs.SetCapacity(capacity);
+                }
+
+                m_simulationPrefabs.m_size = (int)(prefabIndex + 1);
+            }
+
+            // Update simulation prefab reference count.
+            m_simulationPrefabs.m_buffer[prefabIndex].m_refcount++;
+
+            return (ushort)prefabIndex;
+        }
+
+        /// <summary>
+        /// Ends  deserialization of tree info indexes.
+        /// </summary>
+        /// <param name="serializer">Data serializer.</param>
+        private void EndDeserializeInfos(DataSerializer serializer)
+        {
+            // Close off array reading.
+            m_encodedArray.EndRead();
+            m_encodedArray = null;
+
+            // Read prefab names.
+            int numEncodedNames = (int)serializer.ReadUInt16();
+            PrefabData item = default;
+            for (int i = 0; i < numEncodedNames; ++i)
+            {
+                // Check for existing info reference.
+                if (i < m_simulationPrefabs.m_size)
+                {
+                    // Existing info reference - populate the name, but only if it hasn't already been populated (don't overwrite).
+                    if (m_simulationPrefabs.m_buffer[i].m_name == null)
+                    {
+                        m_simulationPrefabs.m_buffer[i].m_name = serializer.ReadUniqueString();
+                    }
+
+                    continue;
+                }
+
+                // New reference.
+                item.m_name = serializer.ReadUniqueString();
+                item.m_refcount = 0;
+                item.m_prefab = null;
+                item.m_replaced = false;
+                m_simulationPrefabs.Add(item);
+            }
         }
     }
 }
