@@ -319,9 +319,10 @@ namespace TreeControl.ExpandedData
                 if (i < m_simulationPrefabs.m_size)
                 {
                     // Existing info reference - populate the name, but only if it hasn't already been populated (don't overwrite).
+                    string prefabName = serializer.ReadUniqueString();
                     if (m_simulationPrefabs.m_buffer[i].m_name == null)
                     {
-                        m_simulationPrefabs.m_buffer[i].m_name = serializer.ReadUniqueString();
+                        m_simulationPrefabs.m_buffer[i].m_name = prefabName;
                     }
 
                     continue;

@@ -1,3 +1,8 @@
+Version 0.9.8.1 hotfix -
+
+- Fix info deserialization for expanded buffers with overlapping info references
+
+
 Version 0.9.8 -
 
 - Implement custom tree info deserializer (should prevent trees changing on load due to info index mismatches)
