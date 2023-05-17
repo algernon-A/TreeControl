@@ -1,3 +1,5 @@
+Version 0.9.8 -
+
 - Implement custom tree info deserializer (should prevent trees changing on load due to info index mismatches)
 
 
