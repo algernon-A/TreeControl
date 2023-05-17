@@ -50,7 +50,7 @@ namespace TreeControl.AnarchyFlags
         /// <param name="serializer">DataSerializer instance.</param>
         public void Deserialize(DataSerializer serializer)
         {
-            Logging.KeyMessage("deserializing tree scaling data");
+            Logging.KeyMessage("deserializing tree anarchy data");
 
             try
             {
