@@ -407,15 +407,24 @@ namespace TreeControl.Patches
                         }
 
                         // If anarchy is enabled, override value of 0 and record this tree as having anarchy.
-                        if (TreeManagerPatches.AnarchyEnabled)
+                        if (TreeManagerPatches.CurrentAnarchyMode == AnarchyMode.Enabled)
                         {
                             SetAnarchyFlag(treeIndex, true);
                             thisValue = 1;
                         }
                         else if (GetAnarchyFlag(treeIndex))
                         {
-                            // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
-                            thisValue = 1;
+                            // This tree has anarchy - check for force-off.
+                            if (TreeManagerPatches.CurrentAnarchyMode == AnarchyMode.ForceOff)
+                            {
+                                // Disable anarchy for this tree and keep hidden growstate.
+                                SetAnarchyFlag(treeIndex, false);
+                            }
+                            else
+                            {
+                                // Always override value of 0 (tree hidden) when anarchy is enabled and the tree wasn't already hidden.
+                                thisValue = 1;
+                            }
                         }
                     }
                 }

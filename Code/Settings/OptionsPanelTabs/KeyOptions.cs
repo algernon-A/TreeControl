@@ -37,6 +37,10 @@ namespace TreeControl
             OptionsKeymapping anarchyKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_ANARCHY"), UIThreading.AnarchyKey);
             currentY += anarchyKeyMapping.Panel.height + Margin;
 
+            // Remove anarchy hotkey control.
+            OptionsKeymapping removeAnarchyKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_REMOVE_ANARCHY"), UIThreading.RemoveAnarchyKey);
+            currentY += removeAnarchyKeyMapping.Panel.height + Margin;
+
             // Snapping hotkey control.
             OptionsKeymapping snappingKeyMapping = OptionsKeymapping.AddKeymapping(panel, LeftMargin, currentY, Translations.Translate("KEY_SNAPPING"), UIThreading.SnappingKey);
             currentY += snappingKeyMapping.Panel.height + Margin;

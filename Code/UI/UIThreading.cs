@@ -33,6 +33,7 @@ namespace TreeControl
 
         // Hotkeys.
         private static Keybinding s_anarchyKey = new Keybinding(KeyCode.A, false, false, true);
+        private static Keybinding s_removeAnarchyKey = new Keybinding(KeyCode.A, false, true, true);
         private static Keybinding s_snappingKey = new Keybinding(KeyCode.S, false, false, true);
         private static Keybinding s_forestryKey = new Keybinding(KeyCode.F, false, false, true);
 
@@ -44,6 +45,7 @@ namespace TreeControl
 
         // Flags.
         private bool _anarchyKeyProcessed = false;
+        private bool _removeAnarchyKeyProcessed = false;
         private bool _snappingKeyProcessed = false;
         private bool _forestryKeyProcessed = false;
         private bool _scaleUpKeyProcessed = false;
@@ -64,6 +66,22 @@ namespace TreeControl
             set
             {
                 s_anarchyKey = value;
+
+                // Update button tooltips if status panel exists.
+                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the remove anarchy hotkey.
+        /// </summary>
+        internal static Keybinding RemoveAnarchyKey
+        {
+            get => s_removeAnarchyKey;
+
+            set
+            {
+                s_removeAnarchyKey = value;
 
                 // Update button tooltips if status panel exists.
                 StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
@@ -143,13 +161,46 @@ namespace TreeControl
                     _anarchyKeyProcessed = true;
 
                     // Toggle anarchy.
-                    TreeManagerPatches.AnarchyEnabled = !TreeManagerPatches.AnarchyEnabled;
+                    if (TreeManagerPatches.CurrentAnarchyMode != AnarchyMode.Enabled)
+                    {
+                        TreeManagerPatches.CurrentAnarchyMode = AnarchyMode.Enabled;
+                    }
+                    else
+                    {
+                        TreeManagerPatches.CurrentAnarchyMode = AnarchyMode.None;
+                    }
                 }
             }
             else
             {
                 // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
                 _anarchyKeyProcessed = false;
+            }
+
+            // Check for remove anarchy hotkey.
+            if (s_removeAnarchyKey.IsPressed())
+            {
+                // Only process if we're not already doing so.
+                if (!_removeAnarchyKeyProcessed)
+                {
+                    // Set processed flag.
+                    _removeAnarchyKeyProcessed = true;
+
+                    // Toggle anarchy.
+                    if (TreeManagerPatches.CurrentAnarchyMode != AnarchyMode.ForceOff)
+                    {
+                        TreeManagerPatches.CurrentAnarchyMode = AnarchyMode.ForceOff;
+                    }
+                    else
+                    {
+                        TreeManagerPatches.CurrentAnarchyMode = AnarchyMode.None;
+                    }
+                }
+            }
+            else
+            {
+                // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
+                _removeAnarchyKeyProcessed = false;
             }
 
             // Check for snapping hotkey.

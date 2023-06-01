@@ -126,7 +126,7 @@ namespace TreeControl
                 }
             };
 
-            _anarchyButton = AddToggleButton(this, "Tree anarchy status", tcAtlas, "AnarchyOff", "AnarchyOn");
+            _anarchyButton = AddToggleButton(this, "Tree anarchy status", tcAtlas, "AnarchyOff", "AnarchyOn", "AnarchyRemove");
             _anarchyButton.relativePosition = new Vector2(ButtonSize + ButtonSpacing, 0f);
             _anarchyButton.tooltipBox = UIToolTips.WordWrapToolTip;
             _anarchyButton.eventActiveStateIndexChanged += (c, state) =>
@@ -134,7 +134,8 @@ namespace TreeControl
                 // Don't do anything if ignoring events.
                 if (!_ignoreEvents)
                 {
-                    TreeManagerPatches.AnarchyEnabled = state != 0;
+                    // Set anarchy mode to reflect current button state.
+                    TreeManagerPatches.CurrentAnarchyMode = (AnarchyMode)state;
                 }
             };
 
@@ -177,7 +178,7 @@ namespace TreeControl
             // Suppress events while changing state.
             _ignoreEvents = true;
             _snappingButton.activeStateIndex = TreeToolPatches.SnappingEnabled ? 1 : 0;
-            _anarchyButton.activeStateIndex = TreeManagerPatches.AnarchyEnabled ? 1 : 0;
+            _anarchyButton.activeStateIndex = (int)TreeManagerPatches.CurrentAnarchyMode;
             _lockForestryButton.activeStateIndex = NaturalResourceManagerPatches.LockForestry ? 1 : 0;
             _ignoreEvents = false;
 
@@ -207,11 +208,28 @@ namespace TreeControl
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("ANARCHY_STATUS"));
             tooltipText.Append(' ');
-            tooltipText.AppendLine(TreeManagerPatches.AnarchyEnabled ? "ON" : "OFF");
+            switch (TreeManagerPatches.CurrentAnarchyMode)
+            {
+                case AnarchyMode.None:
+                    tooltipText.AppendLine(Translations.Translate("OFF"));
+                    break;
+                case AnarchyMode.Enabled:
+                    tooltipText.AppendLine(Translations.Translate("ON"));
+                    break;
+                case AnarchyMode.ForceOff:
+                    tooltipText.AppendLine(Translations.Translate("FORCE_OFF"));
+                    break;
+            }
+
             tooltipText.AppendLine(Translations.Translate("ANARCHY_TIP"));
             tooltipText.Append(Translations.Translate("KEY_ANARCHY"));
             tooltipText.Append(": ");
-            tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.AnarchyKey.Encode()));
+            tooltipText.AppendLine(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.AnarchyKey.Encode()));
+            tooltipText.AppendLine();
+            tooltipText.AppendLine(Translations.Translate("ANARCHY_REMOVE_TIP"));
+            tooltipText.Append(Translations.Translate("KEY_REMOVE_ANARCHY"));
+            tooltipText.Append(": ");
+            tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.RemoveAnarchyKey.Encode()));
             _anarchyButton.tooltip = tooltipText.ToString();
 
             // Lock forestry button tooltip.
@@ -312,10 +330,11 @@ namespace TreeControl
         /// <param name="parent">Parent UIComponent.</param>
         /// <param name="name">Button name.</param>
         /// <param name="atlas">Button atlas.</param>
-        /// <param name="disabledSprite">Foreground sprite for 'disabled' state..</param>
-        /// <param name="enabledSprite">Foreground sprite for 'enabled' state.</param>
+        /// <param name="sprite0">Foreground sprite for state 0 ('disabled').</param>
+        /// <param name="sprite1">Foreground sprite for state 1 ('enabled').</param>
+        /// <param name="sprite2">Foreground sprite for state 2 (<c>null</c> for no third state).</param>
         /// <returns>New UIMultiStateButton.</returns>
-        private UIMultiStateButton AddToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string disabledSprite, string enabledSprite)
+        private UIMultiStateButton AddToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string sprite0, string sprite1, string sprite2 = null)
         {
             // Create button.
             UIMultiStateButton newButton = parent.AddUIComponent<UIMultiStateButton>();
@@ -344,11 +363,11 @@ namespace TreeControl
 
             // State 0 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetZero = fgSpriteSetState[0];
-            fgSpriteSetZero.normal = disabledSprite;
-            fgSpriteSetZero.focused = disabledSprite;
-            fgSpriteSetZero.hovered = disabledSprite;
-            fgSpriteSetZero.pressed = disabledSprite;
-            fgSpriteSetZero.disabled = disabledSprite;
+            fgSpriteSetZero.normal = sprite0;
+            fgSpriteSetZero.focused = sprite0;
+            fgSpriteSetZero.hovered = sprite0;
+            fgSpriteSetZero.pressed = sprite0;
+            fgSpriteSetZero.disabled = sprite0;
 
             // Add state 1.
             fgSpriteSetState.AddState();
@@ -373,11 +392,42 @@ namespace TreeControl
 
             // State 1 foreground.
             UIMultiStateButton.SpriteSet fgSpriteSetOne = fgSpriteSetState[1];
-            fgSpriteSetOne.normal = enabledSprite;
-            fgSpriteSetOne.focused = enabledSprite;
-            fgSpriteSetOne.hovered = enabledSprite;
-            fgSpriteSetOne.pressed = enabledSprite;
-            fgSpriteSetOne.disabled = enabledSprite;
+            fgSpriteSetOne.normal = sprite1;
+            fgSpriteSetOne.focused = sprite1;
+            fgSpriteSetOne.hovered = sprite1;
+            fgSpriteSetOne.pressed = sprite1;
+            fgSpriteSetOne.disabled = sprite1;
+
+            // Add third state if provided.
+            if (sprite2 != null)
+            {
+                fgSpriteSetState.AddState();
+                bgSpriteSetState.AddState();
+                UIMultiStateButton.SpriteSet bgSpriteSetTwo = bgSpriteSetState[2];
+
+                if (s_transparentUI)
+                {
+                    bgSpriteSetTwo.normal = "TransparentBaseFocused";
+                    bgSpriteSetTwo.focused = "TransparentBaseFocused";
+                    bgSpriteSetTwo.hovered = "TransparentBaseHovered";
+                }
+                else
+                {
+                    bgSpriteSetTwo.normal = "OptionBaseFocused";
+                    bgSpriteSetTwo.focused = "OptionBaseFocused";
+                    bgSpriteSetTwo.hovered = "OptionBaseHovered";
+                    bgSpriteSetTwo.pressed = "OptionBasePressed";
+                    bgSpriteSetTwo.disabled = "OptionBase";
+                }
+
+                // State 3 foreground.
+                UIMultiStateButton.SpriteSet fgSpriteSetTwo = fgSpriteSetState[2];
+                fgSpriteSetTwo.normal = sprite2;
+                fgSpriteSetTwo.focused = sprite2;
+                fgSpriteSetTwo.hovered = sprite2;
+                fgSpriteSetTwo.pressed = sprite2;
+                fgSpriteSetTwo.disabled = sprite2;
+            }
 
             // Set initial state.
             newButton.state = UIMultiStateButton.ButtonState.Normal;

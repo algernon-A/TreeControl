@@ -1,3 +1,6 @@
+- Add "remove anarchy" mode.
+
+
 Version 0.9.8.1 hotfix -
 
 - Fix info deserialization for expanded buffers with overlapping info references

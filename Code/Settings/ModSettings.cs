@@ -109,6 +109,12 @@ namespace TreeControl
         public Keybinding AnarchyKey { get => UIThreading.AnarchyKey; set => UIThreading.AnarchyKey = value; }
 
         /// <summary>
+        /// Gets or sets the remove anarchy hotkey.
+        /// </summary>
+        [XmlElement("RemoveAnarchyKey")]
+        public Keybinding RemoveAnarchyKey { get => UIThreading.RemoveAnarchyKey; set => UIThreading.RemoveAnarchyKey = value; }
+
+        /// <summary>
         /// Gets or sets the tree anarchy hotkey.
         /// </summary>
         [XmlElement("SnappingKey")]
