@@ -35,7 +35,7 @@ namespace TreeControl.Patches
                 s_currentAnarchyMode = value;
 
                 // Update status panel.
-                StandalonePanelManager<StatusPanel>.Panel?.Refresh();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.Refresh();
             }
         }
 

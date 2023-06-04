@@ -1,4 +1,4 @@
-﻿// <copyright file="StatusPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+﻿// <copyright file="TreeControlStatusPanel.cs" company="algernon (K. Algernon A. Sheppard)">
 // Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
@@ -16,7 +16,7 @@ namespace TreeControl
     /// <summary>
     /// Icon status panel.
     /// </summary>
-    internal class StatusPanel : StandalonePanelBase
+    internal class TreeControlStatusPanel : StandalonePanelBase
     {
         // Layout constants.
         private const float ButtonSize = 36f;
@@ -57,13 +57,13 @@ namespace TreeControl
                     {
                         if (Loading.IsLoaded)
                         {
-                            StandalonePanelManager<StatusPanel>.Create();
+                            StandalonePanelManager<TreeControlStatusPanel>.Create();
                         }
                     }
                     else
                     {
                         // Hiding - close status panel if open.
-                        StandalonePanelManager<StatusPanel>.Panel?.Close();
+                        StandalonePanelManager<TreeControlStatusPanel>.Panel?.Close();
                     }
                 }
             }
@@ -84,10 +84,10 @@ namespace TreeControl
                     s_transparentUI = value;
 
                     // Regnerate status panel if open.
-                    if (StandalonePanelManager<StatusPanel>.Panel is StatusPanel panel)
+                    if (StandalonePanelManager<TreeControlStatusPanel>.Panel is TreeControlStatusPanel panel)
                     {
                         panel.Close();
-                        StandalonePanelManager<StatusPanel>.Create();
+                        StandalonePanelManager<TreeControlStatusPanel>.Create();
                     }
                 }
             }
@@ -318,8 +318,8 @@ namespace TreeControl
                 _dragging = false;
 
                 // Record new position.
-                StandalonePanelManager<StatusPanel>.LastSavedXPosition = absolutePosition.x;
-                StandalonePanelManager<StatusPanel>.LastSavedYPosition = absolutePosition.y;
+                StandalonePanelManager<TreeControlStatusPanel>.LastSavedXPosition = absolutePosition.x;
+                StandalonePanelManager<TreeControlStatusPanel>.LastSavedYPosition = absolutePosition.y;
                 ModSettings.Save();
             }
         }

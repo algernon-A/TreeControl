@@ -29,7 +29,7 @@ namespace TreeControl.Patches
                 s_lockForestry = value;
 
                 // Update status panel.
-                StandalonePanelManager<StatusPanel>.Panel?.Refresh();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.Refresh();
             }
         }
 

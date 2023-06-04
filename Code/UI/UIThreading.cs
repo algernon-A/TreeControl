@@ -68,7 +68,7 @@ namespace TreeControl
                 s_anarchyKey = value;
 
                 // Update button tooltips if status panel exists.
-                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.UpdateTooltips();
             }
         }
 
@@ -84,7 +84,7 @@ namespace TreeControl
                 s_removeAnarchyKey = value;
 
                 // Update button tooltips if status panel exists.
-                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.UpdateTooltips();
             }
         }
 
@@ -100,7 +100,7 @@ namespace TreeControl
                 s_snappingKey = value;
 
                 // Update button tooltips if status panel exists.
-                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.UpdateTooltips();
             }
         }
 
@@ -115,7 +115,7 @@ namespace TreeControl
                 s_forestryKey = value;
 
                 // Update button tooltips if status panel exists.
-                StandalonePanelManager<StatusPanel>.Panel?.UpdateTooltips();
+                StandalonePanelManager<TreeControlStatusPanel>.Panel?.UpdateTooltips();
             }
         }
 

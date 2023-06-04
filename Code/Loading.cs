@@ -49,10 +49,11 @@ namespace TreeControl
             TreeInstancePatches.FinishLoading();
 
             // Add status panel.
-            if (StatusPanel.ShowButtons)
+            if (TreeControlStatusPanel.ShowButtons)
             {
-                StandalonePanelManager<StatusPanel>.Create();
+                StandalonePanelManager<TreeControlStatusPanel>.Create();
             }
+            AlgernonCommons.Logging.KeyMessage("DOG!");
 
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();

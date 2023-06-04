@@ -54,19 +54,19 @@ namespace TreeControl
 
             // Show panel checkbox.
             UICheckBox showButtonCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SHOW_BUTTONS"));
-            showButtonCheck.isChecked = StatusPanel.ShowButtons;
-            showButtonCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.ShowButtons = isChecked; };
+            showButtonCheck.isChecked = TreeControlStatusPanel.ShowButtons;
+            showButtonCheck.eventCheckChanged += (c, isChecked) => { TreeControlStatusPanel.ShowButtons = isChecked; };
             currentY += showButtonCheck.height + 10f;
 
             // UI transparency checkbox.
             UICheckBox transparencyCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("TRANSPARENT_UI"));
-            transparencyCheck.isChecked = StatusPanel.TransparentUI;
-            transparencyCheck.eventCheckChanged += (c, isChecked) => { StatusPanel.TransparentUI = isChecked; };
+            transparencyCheck.isChecked = TreeControlStatusPanel.TransparentUI;
+            transparencyCheck.eventCheckChanged += (c, isChecked) => { TreeControlStatusPanel.TransparentUI = isChecked; };
             currentY += transparencyCheck.height + 10f;
 
             // Reset position button.
             UIButton resetPositionButton = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("RESET_POS"), 300f);
-            resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<StatusPanel>.ResetPosition();
+            resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<TreeControlStatusPanel>.ResetPosition();
             currentY += resetPositionButton.height + 20f;
 
             // Troubleshooting options.
