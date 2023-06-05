@@ -1,3 +1,5 @@
+Version 0.9.9 -
+
 - Add "remove anarchy" mode.
 - Update button tooltips when mode changes when tooltip is open
 
