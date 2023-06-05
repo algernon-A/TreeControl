@@ -23,6 +23,7 @@ namespace TreeControl.Patches
     {
         // Anarchy status.
         private static AnarchyMode s_currentAnarchyMode = AnarchyMode.None;
+
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
         /// </summary>

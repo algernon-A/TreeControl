@@ -1,4 +1,5 @@
 - Add "remove anarchy" mode.
+- Update button tooltips when mode changes when tooltip is open
 
 
 Version 0.9.8.1 hotfix -

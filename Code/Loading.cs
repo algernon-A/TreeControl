@@ -53,7 +53,6 @@ namespace TreeControl
             {
                 StandalonePanelManager<TreeControlStatusPanel>.Create();
             }
-            AlgernonCommons.Logging.KeyMessage("DOG!");
 
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();

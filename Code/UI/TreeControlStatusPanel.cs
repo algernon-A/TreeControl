@@ -115,7 +115,7 @@ namespace TreeControl
             UITextureAtlas tcAtlas = UITextures.CreateSpriteAtlas("TreeControl", 1024, string.Empty);
 
             _snappingButton = AddToggleButton(this, "Tree snapping status", tcAtlas, "SnappingOff", "SnappingOn");
-            _snappingButton.tooltipBox = UIToolTips.WordWrapToolTip;
+            _snappingButton.tooltipBox = UIToolTips.WordWrapToolTipBox();
             _snappingButton.relativePosition = Vector2.zero;
             _snappingButton.eventActiveStateIndexChanged += (c, state) =>
             {
@@ -128,7 +128,7 @@ namespace TreeControl
 
             _anarchyButton = AddToggleButton(this, "Tree anarchy status", tcAtlas, "AnarchyOff", "AnarchyOn", "AnarchyRemove");
             _anarchyButton.relativePosition = new Vector2(ButtonSize + ButtonSpacing, 0f);
-            _anarchyButton.tooltipBox = UIToolTips.WordWrapToolTip;
+            _anarchyButton.tooltipBox = UIToolTips.WordWrapToolTipBox();
             _anarchyButton.eventActiveStateIndexChanged += (c, state) =>
             {
                 // Don't do anything if ignoring events.
@@ -140,7 +140,7 @@ namespace TreeControl
             };
 
             _lockForestryButton = AddToggleButton(this, "Tree snapping status", tcAtlas, "LockForestOff", "LockForestOn");
-            _lockForestryButton.tooltipBox = UIToolTips.WordWrapToolTip;
+            _lockForestryButton.tooltipBox = UIToolTips.WordWrapToolTipBox();
             _lockForestryButton.relativePosition = new Vector2((ButtonSize + ButtonSpacing) * 2f, 0f);
             _lockForestryButton.eventActiveStateIndexChanged += (c, state) =>
             {
@@ -204,6 +204,12 @@ namespace TreeControl
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.SnappingKey.Encode()));
             _snappingButton.tooltip = tooltipText.ToString();
 
+            // Update snapping button tooltip if open.
+            if (_snappingButton.tooltipBox is UILabel snappingTipBox && snappingTipBox.isVisible)
+            {
+                snappingTipBox.text = _snappingButton.tooltip;
+            }
+
             // Anarchy button tooltip.
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("ANARCHY_STATUS"));
@@ -232,6 +238,12 @@ namespace TreeControl
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.RemoveAnarchyKey.Encode()));
             _anarchyButton.tooltip = tooltipText.ToString();
 
+            // Update anarchy button tooltip if open.
+            if (_anarchyButton.tooltipBox is UILabel anarchyTipBox && anarchyTipBox.isVisible)
+            {
+                anarchyTipBox.text = _anarchyButton.tooltip;
+            }
+
             // Lock forestry button tooltip.
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("FORESTRY_STATUS"));
@@ -242,6 +254,12 @@ namespace TreeControl
             tooltipText.Append(": ");
             tooltipText.Append(SavedInputKey.ToLocalizedString("KEYNAME", UIThreading.ForestryKey.Encode()));
             _lockForestryButton.tooltip = tooltipText.ToString();
+
+            // Update lock forestry button tooltip if open.
+            if (_lockForestryButton.tooltipBox is UILabel forestryTipBox && forestryTipBox.isVisible)
+            {
+                forestryTipBox.text = _lockForestryButton.tooltip;
+            }
         }
 
         /// <summary>
