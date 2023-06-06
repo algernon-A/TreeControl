@@ -197,7 +197,7 @@ namespace TreeControl
             // Snapping button tooltip.
             tooltipText.Append(Translations.Translate("SNAPPING_STATUS"));
             tooltipText.Append(' ');
-            tooltipText.AppendLine(TreeToolPatches.SnappingEnabled ? "ON" : "OFF");
+            tooltipText.AppendLine(Translations.Translate(TreeToolPatches.SnappingEnabled ? "ON" : "OFF"));
             tooltipText.AppendLine(Translations.Translate("SNAPPING_TIP"));
             tooltipText.Append(Translations.Translate("KEY_SNAPPING"));
             tooltipText.Append(": ");
@@ -248,7 +248,7 @@ namespace TreeControl
             tooltipText.Length = 0;
             tooltipText.Append(Translations.Translate("FORESTRY_STATUS"));
             tooltipText.Append(' ');
-            tooltipText.AppendLine(NaturalResourceManagerPatches.LockForestry ? "ON" : "OFF");
+            tooltipText.AppendLine(Translations.Translate(NaturalResourceManagerPatches.LockForestry ? "ON" : "OFF"));
             tooltipText.AppendLine(Translations.Translate("FORESTRY_TIP"));
             tooltipText.Append(Translations.Translate("KEY_FORESTRY"));
             tooltipText.Append(": ");
