@@ -22,18 +22,18 @@ namespace TreeControl.Patches
     internal static class TreeManagerPatches
     {
         // Anarchy status.
-        private static AnarchyMode s_currentAnarchyMode = AnarchyMode.None;
+        private static bool s_anarchyEnabled = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether tree anarchy is enabled.
         /// </summary>
-        internal static AnarchyMode CurrentAnarchyMode
+        internal static bool AnarchyEnabled
         {
-            get => s_currentAnarchyMode;
+            get => s_anarchyEnabled;
 
             set
             {
-                s_currentAnarchyMode = value;
+                s_anarchyEnabled = value;
 
                 // Update status panel.
                 StandalonePanelManager<TreeControlStatusPanel>.Panel?.Refresh();
@@ -145,7 +145,7 @@ namespace TreeControl.Patches
         private static void CreateTreePostfix(TreeManager __instance, uint tree)
         {
             // Set anarchy flag.
-            TreeInstancePatches.SetAnarchyFlag(tree, CurrentAnarchyMode == AnarchyMode.Enabled);
+            TreeInstancePatches.SetAnarchyFlag(tree, AnarchyEnabled);
 
             // Record scale.
             TreeInstancePatches.ScalingArray[tree] = TreeToolPatches.Scaling;

@@ -407,18 +407,23 @@ namespace TreeControl.Patches
                         }
 
                         // If anarchy is enabled, override value of 0 and record this tree as having anarchy.
-                        if (TreeManagerPatches.CurrentAnarchyMode == AnarchyMode.Enabled)
+                        if (TreeManagerPatches.AnarchyEnabled)
                         {
                             SetAnarchyFlag(treeIndex, true);
                             thisValue = 1;
                         }
                         else if (GetAnarchyFlag(treeIndex))
                         {
-                            // This tree has anarchy - check for force-off.
-                            if (TreeManagerPatches.CurrentAnarchyMode == AnarchyMode.ForceOff)
+                            // This tree has anarchy - see if anarchy is disabled.
+                            if (!TreeManagerPatches.AnarchyEnabled)
                             {
-                                // Disable anarchy for this tree and keep hidden growstate.
-                                SetAnarchyFlag(treeIndex, false);
+                                // Anarchy is disabled - if building or network tool is currently enabled then we'll remove anarchy for this tree.
+                                ToolBase currentTool = Singleton<ToolController>.instance.CurrentTool;
+                                if (currentTool is BuildingTool || currentTool is NetTool)
+                                {
+                                    // Disable anarchy for this tree and keep hidden growstate.
+                                    SetAnarchyFlag(treeIndex, false);
+                                }
                             }
                             else
                             {
