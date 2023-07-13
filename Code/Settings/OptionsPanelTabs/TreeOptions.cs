@@ -108,9 +108,17 @@ namespace TreeControl
             lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestryDefault = isChecked; };
             currentY += lockForestryCheck.height + 10f;
 
+            // Tree sway factor.
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(panel, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;
-            currentY += swayFactorSlider.parent.height + Margin;
+            currentY += swayFactorSlider.parent.height;
+
+            // Disable distant tree swaying.
+            UICheckBox disableDistantSwayCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("STOP_DISTANT_SWAY"));
+            disableDistantSwayCheck.tooltip = Translations.Translate("STOP_DISTANT_SWAY_TIP");
+            disableDistantSwayCheck.isChecked = TreeInstancePatches.DisableDistantSway;
+            disableDistantSwayCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.DisableDistantSway = isChecked; };
+            currentY += disableDistantSwayCheck.height + 10f;
 
             // Tree LOD detail.
             string[] lodDetailLevels = new string[(int)TreeLODControl.Resolution.NumResolutions]

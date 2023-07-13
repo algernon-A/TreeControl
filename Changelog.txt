@@ -1,3 +1,6 @@
+- Add option to disable distant tree swaying
+
+
 Version 0.9.9 -
 
 - Automatically remove anarchy from trees when anarchy is off and the building or network tools are in use

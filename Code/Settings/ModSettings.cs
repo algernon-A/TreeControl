@@ -61,6 +61,12 @@ namespace TreeControl
         public float SwayFactor { get => TreeInstancePatches.SwayFactor; set => TreeInstancePatches.SwayFactor = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether distant tree swaying is disabled (<c>true</c>) or enabled (<c>false</c>).
+        /// </summary>
+        [XmlElement("DisableDistantSway")]
+        public bool DisableDistantSway { get => TreeInstancePatches.DisableDistantSway; set => TreeInstancePatches.DisableDistantSway = value; }
+
+        /// <summary>
         /// Gets or sets the tree sway factor.
         /// </summary>
         [XmlElement("LODResolution")]

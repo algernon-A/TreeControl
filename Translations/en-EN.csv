@@ -25,6 +25,8 @@
 "DELETE","Delete","Options panel menu item."
 "TREE_OPTIONS","Tree options","Options panel header."
 "SWAY_FACTOR","Tree movement limit","Options slider title."
+"STOP_DISTANT_SWAY","Stop distant trees from swaying","Checkbox in options panel."
+"STOP_DISTANT_SWAY_TIP","If this is enabled, trees in the FAR distance won't sway at all.","Checkbox tooltip in options panel."
 "TERRAIN_UPDATE","Update tree elevation on terrain change","Checkbox in options panel."
 "TERRAIN_UPDATE_TIP","If this is selected, tree elevations will be changed to match terrain height when and where a terrain change takes place","Checkbox tooltip in options panel."
 "KEEP_ABOVEGROUND","Keep trees above ground","Checkbox in options panel."

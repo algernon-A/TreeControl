@@ -66,6 +66,8 @@ namespace TreeControl.Patches
 
         // Tree swaying.
         private static float s_swayFactor = MinSwayFactor;
+        private static float s_distantSwayFactor = MaxSwayFactor;
+        private static bool s_disableDistantSway = false;
 
         /// <summary>
         /// Gets the tree scaling data array.
@@ -100,7 +102,48 @@ namespace TreeControl.Patches
         /// <summary>
         /// Gets or sets the tree sway factor.
         /// </summary>
-        internal static float SwayFactor { get => s_swayFactor; set => s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor); }
+        internal static float SwayFactor
+        {
+            get => s_swayFactor;
+            set
+            {
+                s_swayFactor = Mathf.Clamp(value, MinSwayFactor, MaxSwayFactor);
+
+                // Update distant swaying if not disabled.
+                s_distantSwayFactor = s_disableDistantSway ? 0 : s_swayFactor;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether distant tree swaying is disabled (<c>true</c>) or enabled (<c>false</c>).
+        /// </summary>
+        internal static bool DisableDistantSway
+        {
+            get => s_disableDistantSway;
+
+            set
+            {
+                // Don't do anything if no change.
+                if (value != s_disableDistantSway)
+                {
+                    s_disableDistantSway = value;
+
+                    // Update distant sway factor to reflect new value.
+                    if (value)
+                    {
+                        Logging.KeyMessage("disabling distant tree swaying");
+                        s_distantSwayFactor = 0f;
+                    }
+                    else
+                    {
+                        Logging.KeyMessage("enabling distant tree swaying");
+                        s_distantSwayFactor = s_swayFactor;
+                    }
+
+                    UpdateRenderGroups();
+                }
+            }
+        }
 
         /// <summary>
         /// Sets the anarchy flag for the given tree to the given status.
@@ -659,7 +702,7 @@ namespace TreeControl.Patches
                     // Looking for call to WeatherManager.GetWindSpeed - append with our sway factor multiplier.
                     Logging.Message("found GetWindSpeed");
                     yield return instruction;
-                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_swayFactor)));
+                    yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(TreeInstancePatches), nameof(s_distantSwayFactor)));
                     yield return new CodeInstruction(OpCodes.Mul);
                     continue;
                 }
