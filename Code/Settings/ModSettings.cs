@@ -37,6 +37,12 @@ namespace TreeControl
         public bool UseTransparentButtons { get => TreeControlStatusPanel.TransparentUI; set => TreeControlStatusPanel.TransparentUI = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the UI anarchy toggle should be enabled (<c>true</c>) or disabled (<c>false</c>) after loading.
+        /// </summary>
+        [XmlElement("EnableAnarchyAfterLoad")]
+        public bool InitialAnarchyState { get => Loading.InitialAnarchyState; set => Loading.InitialAnarchyState = value; }
+
+        /// <summary>
         /// Gets or sets the panel's saved X-position.
         /// </summary>
         [XmlElement("StatusPanelX")]

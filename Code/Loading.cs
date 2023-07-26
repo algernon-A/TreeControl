@@ -17,6 +17,11 @@ namespace TreeControl
     public sealed class Loading : PatcherLoadingBase<OptionsPanel, PatcherBase>
     {
         /// <summary>
+        /// Gets or sets a value indicating whether the UI anarchy toggle should be enabled (<c>true</c>) or disabled (<c>false</c>) after loading.
+        /// </summary>
+        internal static bool InitialAnarchyState { get; set; } = false;
+
+        /// <summary>
         /// Gets a list of permitted loading modes.
         /// </summary>
         protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor };
@@ -47,6 +52,9 @@ namespace TreeControl
 
             // Peform end-of-load actions.
             TreeInstancePatches.FinishLoading();
+
+            // Set initial anarchy state.
+            TreeManagerPatches.AnarchyEnabled = InitialAnarchyState;
 
             // Add status panel.
             if (TreeControlStatusPanel.ShowButtons)

@@ -64,6 +64,12 @@ namespace TreeControl
             transparencyCheck.eventCheckChanged += (c, isChecked) => { TreeControlStatusPanel.TransparentUI = isChecked; };
             currentY += transparencyCheck.height + 10f;
 
+            // Initial anarchy state.
+            UICheckBox enableAfterLoadCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("INITIAL_STATUS"));
+            enableAfterLoadCheck.isChecked = Loading.InitialAnarchyState;
+            enableAfterLoadCheck.eventCheckChanged += (c, isChecked) => { Loading.InitialAnarchyState = isChecked; };
+            currentY += enableAfterLoadCheck.height + 10f;
+
             // Reset position button.
             UIButton resetPositionButton = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("RESET_POS"), 300f);
             resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<TreeControlStatusPanel>.ResetPosition();
@@ -78,13 +84,14 @@ namespace TreeControl
             ignoreTreeAnarchyCheck.tooltip = Translations.Translate("IGNORE_TA_DATA_TIP");
             ignoreTreeAnarchyCheck.isChecked = TreeManagerDataPatches.IgnoreTreeAnarchyData;
             ignoreTreeAnarchyCheck.eventCheckChanged += (c, isChecked) => { TreeManagerDataPatches.IgnoreTreeAnarchyData = isChecked; };
-            currentY += ignoreTreeAnarchyCheck.height;
             ignoreTreeAnarchyCheck.tooltipBox = UIToolTips.WordWrapToolTip;
+            currentY += ignoreTreeAnarchyCheck.height + 10f;
 
             // Logging checkbox.
             UICheckBox loggingCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("DETAIL_LOGGING"));
             loggingCheck.isChecked = Logging.DetailLogging;
             loggingCheck.eventCheckChanged += (c, isChecked) => { Logging.DetailLogging = isChecked; };
+            currentY += loggingCheck.height + Margin;
         }
     }
 }

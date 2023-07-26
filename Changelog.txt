@@ -1,4 +1,5 @@
 - Add option to disable distant tree swaying
+- Add option to set initial anarchy status when loading is completed
 
 
 Version 0.9.9 -
