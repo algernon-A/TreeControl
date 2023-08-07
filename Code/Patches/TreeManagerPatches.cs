@@ -130,9 +130,6 @@ namespace TreeControl.Patches
                     renderManager.UpdateGroup(x, z, treeLayer);
                 }
             }
-
-            // Update trees.
-            TreeInstancePatches.UpdateTrees(__instance);
         }
 
         /// <summary>

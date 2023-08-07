@@ -53,9 +53,6 @@ namespace TreeControl
             // Peform end-of-load actions.
             TreeInstancePatches.FinishLoading();
 
-            // Set initial anarchy state.
-            TreeManagerPatches.AnarchyEnabled = InitialAnarchyState;
-
             // Add status panel.
             if (TreeControlStatusPanel.ShowButtons)
             {

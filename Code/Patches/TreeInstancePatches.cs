@@ -234,24 +234,17 @@ namespace TreeControl.Patches
             // Via simulation thread.
             Singleton<SimulationManager>.instance.AddAction(() =>
             {
-                // Update last three RenderGroup rows (these tend to not be properly refreshed by the game during load if extended tree buffers are in use).
-                RenderManager renderManager = Singleton<RenderManager>.instance;
-                int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
+                // Apply initial tree states.
+                ApplyLoadingStates();
 
-                // 45x45 grid.
-                for (int x = 0; x < 45; ++x)
-                {
-                    // Last three rows.
-                    for (int z = 0; z < 3; ++z)
-                    {
-                        // This ensures that RenderGroups are created and initialized for all grid squares.
-                        // The game doesn't actually always do this for the tree layer.
-                        renderManager.UpdateGroup(x, z, treeLayer);
-                    }
-                }
+                // Update last three RenderGroup rows (these tend to not be properly refreshed by the game during load if extended tree buffers are in use).
+                UpdateRenderGroups();
 
                 // Set terrain ready flag; loading is complete.
                 s_terrainReady = true;
+
+                // Set initial anarchy state.
+                TreeManagerPatches.AnarchyEnabled = Loading.InitialAnarchyState;
             });
         }
 
@@ -259,9 +252,9 @@ namespace TreeControl.Patches
         /// Updates all tree states, correcting tree hights and applying overlaps per the 'Hide on load' setting.
         /// Should generally only be called once at loading.
         /// </summary>
-        /// <param name="treeManager">TreeManager instance.</param>
-        internal static void UpdateTrees(TreeManager treeManager)
+        internal static void ApplyLoadingStates()
         {
+            TreeManager treeManager = Singleton<TreeManager>.instance;
             TreeInstance[] trees = treeManager.m_trees.m_buffer;
 
             // Determine state.
@@ -413,7 +406,7 @@ namespace TreeControl.Patches
             }
             else if (instance.GrowState == 0)
             {
-                // Tree is being shown, where it was hiddenFIr.
+                // Tree is being shown, where it was hidden.
                 instance.GrowState = 1;
                 DistrictManager districtManager = Singleton<DistrictManager>.instance;
                 byte park2 = districtManager.GetPark(instance.Position);

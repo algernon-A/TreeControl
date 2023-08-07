@@ -1,4 +1,4 @@
-- Also ignore legacy  
+- Resequence loading operations
 - Remove redundant tree brush slope limit patch
 
 
