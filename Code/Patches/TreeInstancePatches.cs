@@ -234,7 +234,7 @@ namespace TreeControl.Patches
             // Via simulation thread.
             Singleton<SimulationManager>.instance.AddAction(() =>
             {
-                // Update last three RenderGroup rows (these thend to not be properly refreshed by the game during load if extended tree buffers are in use).
+                // Update last three RenderGroup rows (these tend to not be properly refreshed by the game during load if extended tree buffers are in use).
                 RenderManager renderManager = Singleton<RenderManager>.instance;
                 int treeLayer = Singleton<TreeManager>.instance.m_treeLayer;
 

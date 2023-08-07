@@ -1,3 +1,7 @@
+- Also ignore legacy  
+- Remove redundant tree brush slope limit patch
+
+
 Version 0.9.10 -
 
 - Add option to disable distant tree swaying
