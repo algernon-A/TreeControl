@@ -242,11 +242,14 @@ namespace TreeControl.Patches
 
                 // Set terrain ready flag; loading is complete.
                 s_terrainReady = true;
+
+                // Set initial anarchy state.
+                TreeManagerPatches.AnarchyEnabled = Loading.InitialAnarchyState;
             });
         }
 
         /// <summary>
-        /// Updates all tree states, correcting tree hights and applying overlaps per the 'Hide on load' setting.
+        /// Updates all tree states, correcting tree heights and applying overlaps per the 'Hide on load' setting.
         /// Should generally only be called once at loading.
         /// </summary>
         internal static void ApplyLoadingStates()

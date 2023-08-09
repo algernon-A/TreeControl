@@ -59,9 +59,6 @@ namespace TreeControl
                 StandalonePanelManager<TreeControlStatusPanel>.Create();
             }
 
-            // Set initial anarchy state.
-            TreeManagerPatches.AnarchyEnabled = InitialAnarchyState;
-
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();
         }
