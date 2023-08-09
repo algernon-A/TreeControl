@@ -242,9 +242,6 @@ namespace TreeControl.Patches
 
                 // Set terrain ready flag; loading is complete.
                 s_terrainReady = true;
-
-                // Set initial anarchy state.
-                TreeManagerPatches.AnarchyEnabled = Loading.InitialAnarchyState;
             });
         }
 

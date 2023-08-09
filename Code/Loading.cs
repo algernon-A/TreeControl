@@ -35,7 +35,7 @@ namespace TreeControl
         {
             base.CreatedActions(loading);
 
-            // Set intial status.
+            // Set initial status.
             NaturalResourceManagerPatches.LockForestry = NaturalResourceManagerPatches.LockForestryDefault;
         }
 
@@ -50,7 +50,7 @@ namespace TreeControl
             // Assign tree LOD resolution.
             TreeLODControl.SetLODResolution();
 
-            // Peform end-of-load actions.
+            // Perform end-of-load actions.
             TreeInstancePatches.FinishLoading();
 
             // Add status panel.
@@ -58,6 +58,9 @@ namespace TreeControl
             {
                 StandalonePanelManager<TreeControlStatusPanel>.Create();
             }
+
+            // Set initial anarchy state.
+            TreeManagerPatches.AnarchyEnabled = InitialAnarchyState;
 
             // Patch Move It.
             TreeToolPatches.CheckMoveIt();
