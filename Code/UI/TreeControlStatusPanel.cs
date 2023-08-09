@@ -188,7 +188,7 @@ namespace TreeControl
                 _anarchyButton.activeStateIndex = TreeManagerPatches.AnarchyEnabled ? 1 : 0;
             }
 
-            if (_lastDragPosition != null)
+            if (_lockForestryButton != null)
             {
                 _lockForestryButton.activeStateIndex = NaturalResourceManagerPatches.LockForestry ? 1 : 0;
             }
