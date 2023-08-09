@@ -1,3 +1,8 @@
+Version 0.9.11.2 -
+
+- Adjust intial anarchy state application
+
+
 Version 0.9.11.1 -
 
 - Add null checks to guard against control panel initialization race condition at load
