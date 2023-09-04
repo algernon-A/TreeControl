@@ -268,7 +268,7 @@ namespace TreeControl.Patches
             bool unhiding = networkUnhide | buildingUnhide;
             bool deleting = networkDelete | buildingDelete;
 
-            Logging.Message("updating trees with hiding ", hiding, " unhiding ", unhiding, " deleting ", deleting);
+            Logging.KeyMessage("updating trees with hiding ", hiding, " unhiding ", unhiding, " deleting ", deleting);
 
             // Iterate through all trees.
             for (int i = 0; i < trees.Length; ++i)
