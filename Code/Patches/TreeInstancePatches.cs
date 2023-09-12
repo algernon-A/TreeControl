@@ -294,7 +294,7 @@ namespace TreeControl.Patches
                     // Force-unhiding overlapped trees.
                     uint treeID = (uint)i;
 
-                    if (CheckOverlap(treeID, ref trees[i], networkUnhide, buildingUnhide))
+                    if ((buildingUnhide & networkUnhide) || CheckOverlap(treeID, ref trees[i], networkUnhide, buildingUnhide))
                     {
                         SetAnarchyFlag(treeID, true);
                         UpdateTreeVisibility(ref trees[i], true);
