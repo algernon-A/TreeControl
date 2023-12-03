@@ -106,7 +106,7 @@ namespace TreeControl
             lockForestryCheck.tooltip = Translations.Translate("LOCK_FORESTRY_DEFAULT_TIP");
             lockForestryCheck.isChecked = NaturalResourceManagerPatches.LockForestryDefault;
             lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestryDefault = isChecked; };
-            currentY += lockForestryCheck.height + 10f;
+            currentY += lockForestryCheck.height;
 
             // Random rotation check.
             UICheckBox randomRotationCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("RANDOM_ROTATION"));
