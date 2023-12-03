@@ -65,6 +65,11 @@ namespace TreeControl.MoveItSupport
         }
 
         /// <summary>
+        /// Gets a value indicating whether the Move It tool is currently active.
+        /// </summary>
+        internal bool ToolActive => Singleton<ToolController>.instance.CurrentTool is MoveItTool;
+
+        /// <summary>
         /// Applies the given scaling increment to any trees currently selected by Move It.
         /// </summary>
         /// <param name="increment">Scaling increment to apply.</param>

@@ -69,6 +69,9 @@ namespace TreeControl.Patches
         private static float s_distantSwayFactor = MaxSwayFactor;
         private static bool s_disableDistantSway = false;
 
+        // Move It anarchy override.
+        private static bool s_moveItAnarchy = false;
+
         /// <summary>
         /// Gets the tree scaling data array.
         /// </summary>
@@ -98,6 +101,11 @@ namespace TreeControl.Patches
         /// Gets or sets a value indicating whether trees should be raised to ground level if the terrain is raised above them.
         /// </summary>
         internal static bool KeepAboveGround { get => s_keepAboveGround; set => s_keepAboveGround = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether anarchy should be enabled whenever the Move It tool is active.
+        /// </summary>
+        internal static bool MoveItAnarchy { get => s_moveItAnarchy; set => s_moveItAnarchy = value; }
 
         /// <summary>
         /// Gets or sets the tree sway factor.
@@ -188,7 +196,7 @@ namespace TreeControl.Patches
 
         /// <summary>
         /// Initializes the scaling and anarchy buffers.
-        /// MUST be invoked before referencing either buffer (which includes invokation of TreeInstance.PopulateGroupData on game data deserialization).
+        /// MUST be invoked before referencing either buffer (which includes invocation of TreeInstance.PopulateGroupData on game data deserialization).
         /// </summary>
         /// <param name="size">Buffer size to create.</param>
         internal static void InitializeDataBuffers(int size)
@@ -415,7 +423,7 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony pre-emptive prefix for TreeInstance.GrowState setter to implement tree anarchy.
+        /// Harmony preemptive prefix for TreeInstance.GrowState setter to implement tree anarchy.
         /// </summary>
         /// <param name="__instance">TreeInstance instance.</param>
         /// <param name="value">Value to set.</param>
@@ -429,6 +437,12 @@ namespace TreeControl.Patches
             // If the tree is being hidden, check tree anarchy status.
             if (value == 0)
             {
+                // Automatically implment anarchy if Move It anarchy is enabled and the Move It tool is active.
+                if (s_moveItAnarchy && TreeToolPatches.MoveItToolActive)
+                {
+                    thisValue = 1;
+                }
+
                 // Unsafe, because we need to reverse-engineer the instance ID from the address offset.
                 unsafe
                 {
@@ -533,7 +547,7 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony pre-emptive prefix to TreeInstance.CalculateTree to implement tree snapping.
+        /// Harmony preemptive prefix to TreeInstance.CalculateTree to implement tree snapping.
         /// </summary>
         /// <param name="__instance">TreeInstance instance.</param>
         /// <param name="treeID">Tree ID.</param>
@@ -779,7 +793,7 @@ namespace TreeControl.Patches
         private static Quaternion TreeRotation(Vector3 location) => Quaternion.Euler(0, ((location.x * location.x) + (location.z * location.z)) % 359, 0);
 
         /// <summary>
-        /// Calculates a trees's elevation given current settings.
+        /// Calculates a tree's elevation given current settings.
         /// </summary>
         /// <param name="terrainY">Terrain elevation.</param>
         /// <param name="treeY">Tree elevation.</param>

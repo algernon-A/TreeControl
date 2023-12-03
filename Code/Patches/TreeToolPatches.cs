@@ -93,6 +93,11 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
+        /// Gets a value indicating whether the Move It tool is currnetly in use.
+        /// </summary>
+        internal static bool MoveItToolActive => s_moveItPatches != null && s_moveItPatches.ToolActive;
+
+        /// <summary>
         /// Increments the current scaling factor by the provided amount.
         /// </summary>
         /// <param name="increment">Amount to increment.</param>
@@ -190,7 +195,7 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Harmony pre-emptive prefix to TreeTool.CheckPlacementErrors to implement tree anarchy.
+        /// Harmony preemptive prefix to TreeTool.CheckPlacementErrors to implement tree anarchy.
         /// </summary>
         /// <param name="__result">Original method result.</param>
         /// <returns>False (don't execute original method) if anarchy is enabled, true otherwise.</returns>

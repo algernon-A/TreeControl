@@ -70,6 +70,12 @@ namespace TreeControl
             enableAfterLoadCheck.eventCheckChanged += (c, isChecked) => { Loading.InitialAnarchyState = isChecked; };
             currentY += enableAfterLoadCheck.height + 10f;
 
+            // Initial anarchy state.
+            UICheckBox moveItAnarchyCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("MOVEIT_ANARCHY"));
+            moveItAnarchyCheck.isChecked = TreeInstancePatches.MoveItAnarchy;
+            moveItAnarchyCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.MoveItAnarchy = isChecked; };
+            currentY += moveItAnarchyCheck.height + 10f;
+
             // Reset position button.
             UIButton resetPositionButton = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("RESET_POS"), 300f);
             resetPositionButton.eventClicked += (c, p) => StandalonePanelManager<TreeControlStatusPanel>.ResetPosition();

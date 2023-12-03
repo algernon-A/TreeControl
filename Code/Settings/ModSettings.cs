@@ -43,6 +43,12 @@ namespace TreeControl
         public bool InitialAnarchyState { get => Loading.InitialAnarchyState; set => Loading.InitialAnarchyState = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether anarchy should be enabled whenever the Move It tool is active.
+        /// </summary>
+        [XmlElement("MoveItAnarchy")]
+        public bool MoveItAnarchy { get => TreeInstancePatches.MoveItAnarchy; set => TreeInstancePatches.MoveItAnarchy = value; }
+
+        /// <summary>
         /// Gets or sets the panel's saved X-position.
         /// </summary>
         [XmlElement("StatusPanelX")]
