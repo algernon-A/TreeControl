@@ -67,6 +67,12 @@ namespace TreeControl
         public int TreeLimit { get => TreeManagerDataPatches.CustomTreeLimit; set => TreeManagerDataPatches.CustomTreeLimit = value; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether random tree rotation is in effect.
+        /// </summary>
+        [XmlElement("RandomRotation")]
+        public bool RandomRotation { get => TreeInstancePatches.RandomRotation; set => TreeInstancePatches.RandomRotation = value; }
+
+        /// <summary>
         /// Gets or sets the tree sway factor.
         /// </summary>
         [XmlElement("TreeSwayFactor")]

@@ -93,7 +93,7 @@ namespace TreeControl.Patches
         }
 
         /// <summary>
-        /// Gets a value indicating whether the Move It tool is currnetly in use.
+        /// Gets a value indicating whether the Move It tool is currently in use.
         /// </summary>
         internal static bool MoveItToolActive => s_moveItPatches != null && s_moveItPatches.ToolActive;
 

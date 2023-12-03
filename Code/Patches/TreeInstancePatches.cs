@@ -64,6 +64,9 @@ namespace TreeControl.Patches
         private static bool s_updateOnTerrain = false;
         private static bool s_keepAboveGround = true;
 
+        // Random tree rotation.
+        private static bool s_randomRotation = true;
+
         // Tree swaying.
         private static float s_swayFactor = MinSwayFactor;
         private static float s_distantSwayFactor = MaxSwayFactor;
@@ -106,6 +109,11 @@ namespace TreeControl.Patches
         /// Gets or sets a value indicating whether anarchy should be enabled whenever the Move It tool is active.
         /// </summary>
         internal static bool MoveItAnarchy { get => s_moveItAnarchy; set => s_moveItAnarchy = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether random tree rotation is in effect.
+        /// </summary>
+        internal static bool RandomRotation { get => s_randomRotation; set => s_randomRotation = value; }
 
         /// <summary>
         /// Gets or sets the tree sway factor.
@@ -437,7 +445,7 @@ namespace TreeControl.Patches
             // If the tree is being hidden, check tree anarchy status.
             if (value == 0)
             {
-                // Automatically implment anarchy if Move It anarchy is enabled and the Move It tool is active.
+                // Automatically implement anarchy if Move It anarchy is enabled and the Move It tool is active.
                 if (s_moveItAnarchy && TreeToolPatches.MoveItToolActive)
                 {
                     thisValue = 1;
@@ -471,7 +479,7 @@ namespace TreeControl.Patches
                                 ToolBase currentTool = Singleton<ToolController>.instance.CurrentTool;
                                 if (currentTool is BuildingTool || currentTool is NetTool)
                                 {
-                                    // Disable anarchy for this tree and keep hidden growstate.
+                                    // Disable anarchy for this tree and keep hidden grow state.
                                     SetAnarchyFlag(treeIndex, false);
                                 }
                             }
@@ -790,7 +798,7 @@ namespace TreeControl.Patches
         /// </summary>
         /// <param name="location">Tree location.</param>
         /// <returns>Calculated rotation quaternion.</returns>
-        private static Quaternion TreeRotation(Vector3 location) => Quaternion.Euler(0, ((location.x * location.x) + (location.z * location.z)) % 359, 0);
+        private static Quaternion TreeRotation(Vector3 location) => s_randomRotation ? Quaternion.Euler(0, ((location.x * location.x) + (location.z * location.z)) % 359, 0) : Quaternion.identity;
 
         /// <summary>
         /// Calculates a tree's elevation given current settings.

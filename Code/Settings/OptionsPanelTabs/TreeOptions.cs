@@ -108,6 +108,13 @@ namespace TreeControl
             lockForestryCheck.eventCheckChanged += (c, isChecked) => { NaturalResourceManagerPatches.LockForestryDefault = isChecked; };
             currentY += lockForestryCheck.height + 10f;
 
+            // Random rotation check.
+            UICheckBox randomRotationCheck = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("RANDOM_ROTATION"));
+            randomRotationCheck.tooltip = Translations.Translate("RANDOM_ROTATION_TIP");
+            randomRotationCheck.isChecked = TreeInstancePatches.RandomRotation;
+            randomRotationCheck.eventCheckChanged += (c, isChecked) => { TreeInstancePatches.RandomRotation = isChecked; };
+            currentY += randomRotationCheck.height + 10f;
+
             // Tree sway factor.
             UISlider swayFactorSlider = UISliders.AddPlainSliderWithPercentage(panel, LeftMargin, currentY, Translations.Translate("SWAY_FACTOR"), TreeInstancePatches.MinSwayFactor, TreeInstancePatches.MaxSwayFactor, 0.01f, TreeInstancePatches.SwayFactor);
             swayFactorSlider.eventValueChanged += (c, value) => TreeInstancePatches.SwayFactor = value;

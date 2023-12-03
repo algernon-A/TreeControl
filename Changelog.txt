@@ -1,4 +1,5 @@
 - Add option to automatically enable anarchy whenever the Move It tool is active
+- Add option to disable random tree rotation/
 
 
 Version 0.9.11.3 -
