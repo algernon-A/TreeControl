@@ -11,8 +11,11 @@ namespace TreeControl.Patches
     using AlgernonCommons;
     using AlgernonCommons.UI;
     using ColossalFramework;
+    using ColossalFramework.Math;
     using HarmonyLib;
+    using UnityEngine;
     using static TreeManager;
+    using TreeInstance = TreeInstance;
 
     /// <summary>
     /// Harmony patches to implement tree snapping.
@@ -152,6 +155,48 @@ namespace TreeControl.Patches
             {
                 __instance.m_trees.m_buffer[tree].m_flags |= (ushort)TreeInstance.Flags.FixedHeight;
             }
+
+            // Set fixed height for any trees snapped to buildings.
+            else if (TreeToolPatches.SnappingEnabled && CheckBuildingOverlap(ref __instance.m_trees.m_buffer[tree], tree))
+            {
+                // Snapping is enabled and the tree overlaps with a building - set fixed height flag.
+                __instance.m_trees.m_buffer[tree].m_flags |= (ushort)TreeInstance.Flags.FixedHeight;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if a building overlaps the given tree instance.
+        /// </summary>
+        /// <param name="treeInstance">Tree instance.</param>
+        /// <param name="treeID">Tree ID>.</param>
+        /// <returns><c>true</c>If the tree overlaps a building, <c>false</c> otherwise.</returns>
+        private static bool CheckBuildingOverlap(ref TreeInstance treeInstance, uint treeID)
+        {
+            // Null check.
+            TreeInfo treeInfo = treeInstance.Info;
+            if (treeInfo is null)
+            {
+                return false;
+            }
+
+            // Calculate tree height and effective radius.
+            ItemClass.CollisionType collisionType = ((treeInstance.m_flags & 0x20) != 0) ? ItemClass.CollisionType.Elevated : ItemClass.CollisionType.Terrain;
+            Randomizer randomizer = new Randomizer(treeID);
+            float scale = treeInfo.m_minScale + ((float)randomizer.Int32(10000u) * (treeInfo.m_maxScale - treeInfo.m_minScale) * 0.0001f);
+            float treeHeight = treeInfo.m_generatedInfo.m_size.y * scale;
+            Vector3 position = treeInstance.Position;
+            float y = position.y;
+            float maxY = position.y + treeHeight;
+            float treeRadius = treeInstance.Single ? 0.3f : 4.5f;
+
+            // Check for building collision.
+            Quad2 quad = default;
+            Vector2 vector = VectorUtils.XZ(position);
+            quad.a = vector + new Vector2(0f - treeRadius, 0f - treeRadius);
+            quad.b = vector + new Vector2(0f - treeRadius, treeRadius);
+            quad.c = vector + new Vector2(treeRadius, treeRadius);
+            quad.d = vector + new Vector2(treeRadius, 0f - treeRadius);
+            return Singleton<BuildingManager>.instance.OverlapQuad(quad, y, maxY, collisionType, treeInfo.m_class.m_layer, 0, 0, 0);
         }
     }
 }

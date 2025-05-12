@@ -1,3 +1,4 @@
+- Ensure tree flags are set correctly when trees are snapped to buildings without any elevation adjustment being set
 - Ensure tree elevation changes snap to zero
 
 
