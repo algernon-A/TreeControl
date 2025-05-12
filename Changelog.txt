@@ -1,3 +1,6 @@
+- Ensure tree elevation changes snap to zero
+
+
 Version 1.0 -
 
 - Add option to automatically enable anarchy whenever the Move It tool is active

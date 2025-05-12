@@ -84,10 +84,17 @@ namespace TreeControl.Patches
 
             set
             {
-                // Only change value if a tree is selected.
+                // Only change value if a tree is selected for placement.
                 if (Singleton<ToolController>.instance.CurrentTool is TreeTool treeTool && treeTool.m_prefab is TreeInfo)
                 {
                     s_elevationAdjustment = value;
+
+                    // Check for any close-to-zero amounts.
+                    if (Mathf.Abs(value) < 0.09f)
+                    {
+                        // Set to zero.
+                        s_elevationAdjustment = 0f;
+                    }
                 }
             }
         }
