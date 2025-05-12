@@ -580,10 +580,10 @@ namespace TreeControl.Patches
                 __instance.m_posY = (ushort)Mathf.Clamp(Mathf.RoundToInt(position.y * 64f), 0, 65535);
             }
 
-            // Check overlap if anarchy isn't enabled, or game is loading and we've got 'hide on load' selected.
+            // Actions once terrain is ready.
             if (s_terrainReady)
             {
-                // Terrain ready - apply normal anarchy.
+                // Apply overlap check if anarchy isn't enabled.
                 if (!GetAnarchyFlag(treeID))
                 {
                     CheckOverlap(ref __instance, treeID);
